@@ -1,0 +1,50 @@
+generated: '2026-07-27'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.powershop.com.au
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Nov 21 23:59:59 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: cdr.energymadeeasy.gov.au
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Jan 31 23:59:59 2027 GMT
+  hsts: null
+- host: public.cdr.powershop.com.au
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct 18 23:59:59 2026 GMT
+  hsts: null
+  hsts_note: >-
+    The probe records null because the host root returns an nginx 404 with no
+    security headers. A GET of a real CDS endpoint on the same host
+    (/cds-au/v1/discovery/status) does return
+    strict-transport-security: max-age=63072000; includeSubDomains, plus
+    x-content-type-options: nosniff and x-frame-options: DENY. HSTS is present on
+    the API responses that matter.
+domains:
+- domain: powershop.com.au
+  dnssec: true
+  caa:
+  - 0 issuewild "pki.goog; cansignhttpexchanges=yes"
+  - 0 issuewild "ssl.com"
+  - 0 issue "amazon.com"
+  - 0 issue "comodoca.com"
+  - 0 issue "digicert.com; cansignhttpexchanges=yes"
+  - 0 issue "letsencrypt.org"
+  spf: true
+  dmarc: true
+  dmarc_policy: quarantine
+- domain: energymadeeasy.gov.au
+  dnssec: false
+  caa:
+  - 0 issuewild "amazontrust.com"
+  - 0 issuewild "awstrust.com"
+  - 0 issuewild "amazon.com"
+  - 0 issuewild "amazonaws.com"
+  spf: true
+  dmarc: true
+  dmarc_policy: quarantine

@@ -1,0 +1,189 @@
+generated: '2026-07-27'
+method: derived
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json (133 component schemas) +
+  openapi/powershop-cdr-common-api-openapi.json (27 component schemas)
+scope: >-
+  The CDR energy entity graph Powershop implements. Two disjoint subgraphs: the
+  open EnergyPlan graph (served anonymously by the AER for Powershop's 482 retail
+  plans) and the consented graph rooted at EnergyAccount and EnergyServicePoint
+  (reachable only by an accredited data recipient holding a consumer consent).
+  Nothing here is Powershop-authored — the schemas are the Data Standards Body's.
+identifiers:
+- entity: EnergyPlan
+  id_field: planId
+  type: ASCIIString
+  observed_shape: 'PSH<digits><letters>@EME — e.g. PSH1060421MRE2@EME. The @EME suffix reflects the Energy Made Easy host that serves it.'
+  public: true
+- entity: EnergyAccount
+  id_field: accountId
+  type: ASCIIString
+  public: false
+  note: Opaque, consent-scoped. Also carries a human accountNumber field.
+- entity: EnergyServicePoint
+  id_field: servicePointId
+  type: ASCIIString
+  public: false
+  note: The National Metering Identifier (NMI) surface; values are returned by the service point list endpoints.
+- entity: EnergyInvoice
+  id_field: invoiceNumber
+  public: false
+entities:
+- name: EnergyPlan
+  schemas: [EnergyPlan, EnergyPlanDetailV3, EnergyPlanListResponse, EnergyPlanResponseV3]
+  surface: public
+  operations: [listEnergyPlans, getEnergyPlanDetail]
+  description: A retail energy plan openly offered to the market. 482 exist for Powershop.
+  key_fields: [planId, effectiveFrom, effectiveTo, lastUpdated, displayName, description, type, fuelType, brand, brandName, applicationUri]
+  enumerations:
+    type: [STANDING, MARKET, REGULATED]
+    fuelType: [ELECTRICITY, GAS, DUAL]
+    customerType: [RESIDENTIAL, BUSINESS]
+  relationships:
+  - {kind: has_one, target: EnergyPlan_geography, via: geography}
+  - {kind: has_one, target: EnergyPlan_additionalInformation, via: additionalInformation}
+  - {kind: has_one, target: EnergyPlanContractFullV3, via: 'EnergyPlanDetailV3_allOf.electricityContract'}
+  - {kind: has_one, target: EnergyPlanContractFullV3, via: 'EnergyPlanDetailV3_allOf.gasContract'}
+  - {kind: has_many, target: EnergyPlanDetailV3_allOf_meteringCharges, via: 'EnergyPlanDetailV3_allOf.meteringCharges'}
+- name: EnergyPlan_geography
+  surface: public
+  description: Where a plan is available. The distributor list is how Powershop's real state coverage was established.
+  key_fields: [distributors, excludedPostcodes, includedPostcodes]
+  observed_distributors: [Ausgrid, Endeavour Energy, Essential Energy, Jemena, Citipower, Powercor, United Energy, AusNet, Multinet, Energex, SA Power Networks, Australian Gas Networks]
+- name: EnergyPlanContractFullV3
+  schemas: [EnergyPlanContractV3, EnergyPlanContractFullV3]
+  surface: public
+  description: The tariff and terms attached to a plan for one fuel type.
+  key_fields: [additionalFeeInformation, pricingModel, timeZone, isFixed, variation, onExpiryDescription, paymentOption, solarFeedInTariff, fees, termType, benefitPeriod, terms, meterTypes, coolingOffDays, billFrequency]
+  relationships:
+  - {kind: has_one, target: EnergyPlanContractV3_intrinsicGreenPower, via: intrinsicGreenPower}
+  - {kind: has_many, target: EnergyPlanControlledLoadV2, via: controlledLoad}
+  - {kind: has_many, target: EnergyPlanIncentives, via: incentives}
+  - {kind: has_many, target: EnergyPlanDiscounts, via: discounts}
+  - {kind: has_many, target: EnergyPlanGreenPowerCharges, via: greenPowerCharges}
+  - {kind: has_many, target: EnergyPlanEligibility, via: eligibility}
+  - {kind: has_many, target: EnergyPlanTariffPeriodV2, via: tariffPeriod}
+- name: EnergyAccount
+  schemas: [EnergyAccountBaseV2, EnergyAccountV2, EnergyAccountDetailV4]
+  surface: consented
+  operations: [listEnergyAccounts, getEnergyAccountDetail]
+  scopes: [energy:accounts.basic:read, energy:accounts.detail:read]
+  key_fields: [accountId, accountNumber, displayName, openStatus, creationDate]
+  relationships:
+  - {kind: has_many, target: EnergyAccountPlan, via: plans}
+  - {kind: has_many, target: EnergyServicePointId, via: 'plans[].servicePointIds'}
+  - {kind: has_one, target: EnergyBalanceResponse_data, via: getEnergyAccountBalance}
+  - {kind: has_many, target: EnergyInvoice, via: getEnergyAccountInvoices}
+  - {kind: has_many, target: EnergyBillingTransactionV3, via: getBillingForEnergyAccount}
+  - {kind: has_many, target: EnergyPaymentSchedule, via: getEnergyAccountPaymentSchedule}
+  - {kind: has_many, target: EnergyConcession, via: getEnergyAccountConcessions}
+- name: EnergyAccountPlan
+  schemas: [EnergyAccountV2_allOf_plans, EnergyAccountDetailV4_allOf_plans]
+  surface: consented
+  description: A plan as attached to an account, joining the account graph to the plan graph.
+  key_fields: [nickname, servicePointIds]
+  relationships:
+  - {kind: has_one, target: EnergyAccountV2_allOf_planOverview, via: planOverview}
+  - {kind: has_one, target: EnergyAccountDetailV4_allOf_planDetail, via: planDetail}
+  - {kind: has_many, target: EnergyAccountDetailV4_allOf_authorisedContacts, via: authorisedContacts}
+  - {kind: belongs_to, target: EnergyServicePointId, via: servicePointIds}
+- name: EnergyServicePoint
+  schemas: [EnergyServicePointV2, EnergyServicePointDetailV2]
+  surface: consented
+  operations: [listElectricityServicePoints, getElectricityServicePointDetail]
+  scopes: [energy:electricity.servicepoints.basic:read, energy:electricity.servicepoints.detail:read]
+  description: NMI standing data, sourced from AEMO as secondary data holder.
+  relationships:
+  - {kind: has_one, target: EnergyServicePointV2_consumerProfile, via: consumerProfile}
+  - {kind: has_one, target: EnergyServicePointDetailV2_allOf_distributionLossFactor, via: distributionLossFactor}
+  - {kind: has_many, target: EnergyServicePointDetailV2_allOf_relatedParticipants, via: relatedParticipants}
+  - {kind: has_many, target: EnergyServicePointDetailV2_allOf_meters, via: meters}
+  - {kind: has_many, target: EnergyServicePointDetailV2_allOf_registers, via: registers}
+  - {kind: has_many, target: EnergyUsageRead, via: getElectricityServicePointUsage}
+  - {kind: has_one, target: EnergyDerRecord, via: getElectricityDERForServicePoint}
+- name: EnergyUsageRead
+  surface: consented
+  operations: [getElectricityServicePointUsage, listElectricityUsageBulk, listElectricityUsageForServicePoints]
+  scopes: [energy:electricity.usage:read]
+  description: Interval metering data, sourced from AEMO as secondary data holder.
+  relationships:
+  - {kind: has_one, target: EnergyUsageRead_basicRead, via: basicRead}
+  - {kind: has_one, target: EnergyUsageRead_intervalRead, via: intervalRead}
+- name: EnergyDerRecord
+  surface: consented
+  operations: [getElectricityDERForServicePoint, listElectricityDERBulk, listElectricityDERForSpecificServicePoints]
+  scopes: [energy:electricity.der:read]
+  description: Distributed Energy Resource register data — rooftop solar, inverters and batteries.
+  key_fields: [servicePointId, approvedCapacity, availablePhasesCount, installedPhasesCount, islandableInstallation, hasCentralProtectionControl]
+  relationships:
+  - {kind: has_one, target: EnergyDerRecord_protectionMode, via: protectionMode}
+  - {kind: has_many, target: EnergyDerRecord_acConnections, via: acConnections}
+- name: EnergyDerRecord_acConnections
+  surface: consented
+  key_fields: [connectionIdentifier, count, equipmentType, manufacturerName, inverterSeries, inverterModelNumber, commissioningDate, status, inverterDeviceCapacity]
+  relationships:
+  - {kind: has_many, target: EnergyDerRecord_derDevices, via: derDevices}
+- name: EnergyDerRecord_derDevices
+  surface: consented
+  key_fields: [deviceIdentifier, count, manufacturer, modelNumber, status, type, subtype, nominalRatedCapacity, nominalStorageCapacity]
+- name: EnergyInvoice
+  surface: consented
+  operations: [getEnergyAccountInvoices, listEnergyAccountInvoicesBulk, listEnergyInvoicesForSpecificAccounts]
+  scopes: [energy:billing:read]
+  key_fields: [accountId, invoiceNumber, issueDate, dueDate, invoiceAmount, gstAmount, balanceAtIssue, servicePoints]
+  relationships:
+  - {kind: belongs_to, target: EnergyAccount, via: accountId}
+  - {kind: has_one, target: EnergyInvoice_period, via: period}
+  - {kind: has_one, target: EnergyInvoice_payOnTimeDiscount, via: payOnTimeDiscount}
+  - {kind: has_one, target: EnergyInvoiceAccountCharges, via: accountCharges}
+  - {kind: has_one, target: EnergyInvoiceGasUsageCharges, via: gas}
+  - {kind: has_one, target: EnergyInvoiceElectricityUsageCharges, via: electricity}
+- name: EnergyBillingTransactionV3
+  surface: consented
+  operations: [getBillingForEnergyAccount, listEnergyAccountBillingBulk, listEnergyAccountBillingForSpecificAccounts]
+  scopes: [energy:billing:read]
+  description: A polymorphic billing transaction discriminated by transactionUType.
+  key_fields: [accountId, executionDateTime, gst, transactionUType]
+  relationships:
+  - {kind: belongs_to, target: EnergyAccount, via: accountId}
+  - {kind: has_one, target: EnergyBillingUsageTransactionV2, via: usage}
+  - {kind: has_one, target: EnergyBillingDemandTransactionV3, via: demand}
+  - {kind: has_one, target: EnergyBillingOnceOffTransaction, via: onceOff}
+  - {kind: has_one, target: EnergyBillingOtherTransaction, via: otherCharges}
+  - {kind: has_one, target: EnergyBillingPaymentTransaction, via: payment}
+- name: EnergyPaymentSchedule
+  surface: consented
+  operations: [getEnergyAccountPaymentSchedule]
+  scopes: [energy:accounts.paymentschedule:read]
+  description: A polymorphic payment arrangement discriminated by paymentScheduleUType.
+  relationships:
+  - {kind: has_one, target: EnergyPaymentSchedule_cardDebit, via: cardDebit}
+  - {kind: has_one, target: EnergyPaymentSchedule_directDebit, via: directDebit}
+  - {kind: has_one, target: EnergyPaymentSchedule_digitalWallet, via: digitalWallet}
+  - {kind: has_one, target: EnergyPaymentSchedule_manualPayment, via: manualPayment}
+- name: EnergyConcession
+  surface: consented
+  operations: [getEnergyAccountConcessions]
+  scopes: [energy:accounts.concessions:read]
+  key_fields: [type, displayName, additionalInfo, startDate, endDate, discountFrequency, amount, percentage, appliedTo]
+- name: CommonCustomer
+  schemas: [CommonPerson, CommonPersonDetailV2, CommonOrganisation, CommonOrganisationDetailV2]
+  surface: consented
+  source_spec: openapi/powershop-cdr-common-api-openapi.json
+  operations: [getCustomer, getCustomerDetail]
+  scopes: [common:customer.basic:read, common:customer.detail:read]
+  description: The authorising consumer — a person or an organisation, discriminated by customerUType.
+envelope_schemas:
+  note: Every response wraps its payload in the CDS envelope.
+  singular: '{ data, links: Links, meta: Meta }'
+  paginated: '{ data, links: LinksPaginated, meta: MetaPaginated }'
+  meta_paginated_fields: [totalRecords, totalPages]
+  links_paginated_fields: [self, first, prev, next, last]
+graph_note: >-
+  There is no join between the public plan graph and the consented account graph
+  for an outside caller: EnergyAccountPlan carries plan detail inline rather than
+  a foreign key into the AER-hosted planId space. Open tariff data and consented
+  consumer data are two separate worlds that happen to describe the same product.
+cross_links:
+  scopes: scopes/powershop-scopes.yml
+  conventions: conventions/powershop-conventions.yml

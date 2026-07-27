@@ -1,0 +1,111 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Powershop CDR Energy
+  version: 1.0.0
+extends: openapi/powershop-cdr-energy-api-openapi.json
+x-apievangelist-note: >-
+  The extended document is the Data Standards Body's shared CDR Energy API
+  specification, stored verbatim. Powershop authors no API contract of its own.
+  This overlay records what API Evangelist verified about Powershop's specific
+  implementation of that shared contract on 2026-07-27 — which operations are
+  live and anonymous, which host actually serves them, and which are gated
+  behind ACCC accreditation. The original spec is never mutated.
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: powershop
+    x-apievangelist-provider-name: Powershop
+    x-apievangelist-legal-entity: Powershop Australia Pty Ltd
+    x-apievangelist-abn: '41154914075'
+    x-apievangelist-parent: Shell Energy Australia
+    x-apievangelist-regime: Consumer Data Right (Australia) — energy sector designation
+    x-apievangelist-spec-authored-by: Data Standards Body (Treasury, Australia)
+    x-apievangelist-spec-first-party: false
+    x-apievangelist-verified: '2026-07-27'
+    x-apievangelist-cdr-brand-id: 6aaeaf9b-5132-ee11-a83d-000d3a8830d6
+- target: $.servers
+  update:
+  - description: >-
+      Australian Energy Regulator Energy Made Easy CDR host — serves Powershop's
+      Generic Tariff (plan) data anonymously. Under the energy designation the AER,
+      not the retailer, is the data holder for generic tariff data.
+    url: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+    x-apievangelist-authenticated: false
+    x-apievangelist-verified-live: true
+  - description: >-
+      Powershop's own registered CDR public base URI. Serves the Common Discovery
+      endpoints only; /energy/plans returns 404 here.
+    url: https://public.cdr.powershop.com.au/cds-au/v1
+    x-apievangelist-authenticated: false
+    x-apievangelist-verified-live: true
+  - description: >-
+      Authenticated CDR data-holder base URI for consented consumer data. Not
+      published anonymously — resolved through the CDR Register over mutual TLS by
+      accredited data recipients. Deliberately not asserted as a URL.
+    url: https://mtls.dh.example.com/cds-au/v1
+    x-apievangelist-authenticated: true
+    x-apievangelist-placeholder: true
+- target: $.paths['/energy/plans'].get
+  update:
+    x-apievangelist-live: true
+    x-apievangelist-host: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+    x-apievangelist-authenticated: false
+    x-apievangelist-max-version-observed: '1'
+    x-apievangelist-note: >-
+      Confirmed HTTP 200 on 2026-07-27 with meta.totalRecords 482 — 416
+      electricity and 66 gas plans, 313 MARKET and 169 STANDING, 297 residential
+      and 185 business, across the Ausgrid, Endeavour, Essential Energy, Jemena,
+      Citipower, Powercor, United Energy, AusNet, Multinet, Energex, SA Power
+      Networks and Australian Gas Networks distribution zones.
+- target: $.paths['/energy/plans/{planId}'].get
+  update:
+    x-apievangelist-live: true
+    x-apievangelist-host: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+    x-apievangelist-authenticated: false
+    x-apievangelist-example-plan-id: PSH1060421MRE2@EME
+    x-apievangelist-note: >-
+      Confirmed HTTP 200 for planId PSH1060421MRE2@EME. An unknown planId returns
+      HTTP 404 urn:au-cds:error:cds-all:Resource/NotFound.
+- target: $.paths['/energy/accounts'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:accounts.basic:read]
+    x-apievangelist-verified: structurally
+- target: $.paths['/energy/accounts/{accountId}'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:accounts.detail:read]
+- target: $.paths['/energy/accounts/{accountId}/balance'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:billing:read]
+- target: $.paths['/energy/accounts/{accountId}/invoices'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:billing:read]
+- target: $.paths['/energy/accounts/{accountId}/billing'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:billing:read]
+- target: $.paths['/energy/accounts/{accountId}/payment-schedule'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:accounts.paymentschedule:read]
+- target: $.paths['/energy/accounts/{accountId}/concessions'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:accounts.concessions:read]
+- target: $.paths['/energy/electricity/servicepoints'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:electricity.servicepoints.basic:read]
+- target: $.paths['/energy/electricity/servicepoints/{servicePointId}/usage'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:electricity.usage:read]
+    x-apievangelist-secondary-data-holder: AEMO
+- target: $.paths['/energy/electricity/servicepoints/{servicePointId}/der'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [energy:electricity.der:read]
+    x-apievangelist-secondary-data-holder: AEMO

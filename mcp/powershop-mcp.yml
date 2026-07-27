@@ -1,0 +1,94 @@
+generated: '2026-07-27'
+method: derived
+status: candidate
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json +
+  openapi/powershop-cdr-common-api-openapi.json
+note: >-
+  No official Powershop-hosted MCP server exists, and none is plausible —
+  Powershop runs no developer programme at all. This is a candidate tool list
+  derived from the operations that are genuinely reachable without credentials:
+  the two Generic Tariff operations the Australian Energy Regulator serves for
+  Powershop, and the two CDS Discovery operations on Powershop's own registered
+  CDR host. Every tool below requires the CDS x-v version header and no
+  authentication. The 23 consented operations are deliberately excluded — they
+  are unusable by an agent without ACCC accreditation and mutual TLS.
+server:
+  name: powershop
+  transport: http
+  url: null
+  hosted_by_provider: false
+tools:
+- name: list_energy_plans
+  description: >-
+    List Powershop retail energy plans from the CDR Generic Tariff surface. 482
+    plans as of 2026-07-27 — 416 electricity and 66 gas, 313 MARKET and 169
+    STANDING. Supports filtering by type, fuelType, effective, updated-since and
+    brand, with page / page-size pagination.
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#listEnergyPlans
+  endpoint: GET https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1/energy/plans
+  headers: {x-v: '1'}
+  authenticated: false
+  verified_live: true
+- name: get_energy_plan_detail
+  description: >-
+    Get full detail for one Powershop plan by planId — tariff periods, rates,
+    discounts, incentives, GreenPower charges, solar feed-in tariff, eligibility,
+    fees, contract terms and geography (distributors and postcodes).
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#getEnergyPlanDetail
+  endpoint: GET https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1/energy/plans/{planId}
+  headers: {x-v: '3'}
+  example_input: {planId: PSH1060421MRE2@EME}
+  authenticated: false
+  verified_live: true
+- name: get_cdr_status
+  description: >-
+    Get the operational status of Powershop's CDR implementation — OK,
+    PARTIAL_FAILURE, UNAVAILABLE or SCHEDULED_OUTAGE, with an updateTime and a
+    human explanation.
+  source_operation: openapi/powershop-cdr-common-api-openapi.json#getStatus
+  endpoint: GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  headers: {x-v: '1'}
+  authenticated: false
+  verified_live: true
+- name: get_cdr_outages
+  description: Get scheduled outages for Powershop's CDR implementation, with outage time, duration and whether the outage is partial.
+  source_operation: openapi/powershop-cdr-common-api-openapi.json#getOutages
+  endpoint: GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/outages
+  headers: {x-v: '1'}
+  authenticated: false
+  verified_live: true
+excluded_operations:
+  reason: >-
+    Require ACCC accredited data recipient status, CDR Register-issued mutual-TLS
+    certificates, and an explicit consumer consent. There is no key, sandbox or
+    partner path an agent could take.
+  count: 23
+  operations:
+  - listEnergyAccounts
+  - getEnergyAccountDetail
+  - getEnergyAccountBalance
+  - listEnergyAccountBalancesBulk
+  - listEnergyAccountBalancesSpecificAccounts
+  - getEnergyAccountInvoices
+  - listEnergyAccountInvoicesBulk
+  - listEnergyInvoicesForSpecificAccounts
+  - getBillingForEnergyAccount
+  - listEnergyAccountBillingBulk
+  - listEnergyAccountBillingForSpecificAccounts
+  - getEnergyAccountPaymentSchedule
+  - getEnergyAccountConcessions
+  - listElectricityServicePoints
+  - getElectricityServicePointDetail
+  - getElectricityServicePointUsage
+  - listElectricityUsageBulk
+  - listElectricityUsageForServicePoints
+  - getElectricityDERForServicePoint
+  - listElectricityDERBulk
+  - listElectricityDERForSpecificServicePoints
+  - getCustomer
+  - getCustomerDetail
+cross_links:
+  conventions: conventions/powershop-conventions.yml
+  errors: errors/powershop-problem-types.yml
+  skills: skills/_index.yml

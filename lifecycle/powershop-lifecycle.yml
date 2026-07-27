@@ -1,0 +1,114 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json (x-version / x-version-notes per
+  operation) + openapi/powershop-cdr-common-api-openapi.json + DSB Consumer Data
+  Standards versioning and change-management sections + live probes
+versioning:
+  scheme: header-integer-per-endpoint
+  spec_version: 1.36.0
+  request_header: x-v (required), x-min-v (optional)
+  docs: https://consumerdatastandardsaustralia.github.io/standards/#versioning
+  note: >-
+    CDR versions each endpoint independently with a positive integer negotiated
+    through the x-v / x-min-v request headers, not through a URI path or media
+    type. Obsolete endpoint versions are documented and retained rather than
+    removed. The x-version values below are the current endpoint versions
+    declared in the Consumer Data Standards v1.36.0 specifications Powershop
+    implements.
+  current:
+    listEnergyPlans: '1'
+    getEnergyPlanDetail: '3'
+    listElectricityServicePoints: '2'
+    getElectricityServicePointDetail: '2'
+    getElectricityServicePointUsage: '1'
+    listElectricityUsageBulk: '1'
+    listElectricityUsageForServicePoints: '1'
+    getElectricityDERForServicePoint: '1'
+    listElectricityDERBulk: '1'
+    listElectricityDERForSpecificServicePoints: '1'
+    listEnergyAccounts: '2'
+    getEnergyAccountDetail: '4'
+    getEnergyAccountPaymentSchedule: '1'
+    getEnergyAccountConcessions: '1'
+    getEnergyAccountBalance: '1'
+    listEnergyAccountBalancesBulk: '1'
+    listEnergyAccountBalancesSpecificAccounts: '1'
+    getEnergyAccountInvoices: '1'
+    listEnergyAccountInvoicesBulk: '1'
+    listEnergyInvoicesForSpecificAccounts: '1'
+    getBillingForEnergyAccount: '3'
+    listEnergyAccountBillingBulk: '3'
+    listEnergyAccountBillingForSpecificAccounts: '3'
+    getCustomer: '1'
+    getCustomerDetail: '2'
+    getStatus: '1'
+    getOutages: '1'
+  live_max_version_observed:
+    listEnergyPlans: '1'
+    evidence: 'x-v: 9 on the AER host returned HTTP 406 with detail "Header x-v greater than maximum supported [x-v=9, max=1]"'
+deprecation:
+  policy: >-
+    The Consumer Data Standards define a formal change-management and
+    obsolescence lifecycle run by the Data Standards Body through numbered
+    maintenance iterations and binding Decisions, with future-dated obligation
+    milestones. New endpoint versions are introduced additively; superseded
+    versions are marked obsolete and retained before retirement. Data holders
+    such as Powershop implement to the obligation dates rather than publishing
+    their own deprecation policy.
+  policy_url: https://consumerdatastandardsaustralia.github.io/standards/#versioning
+  sunset_header: false
+  rfc8594: false
+  first_party_policy: false
+  first_party_note: >-
+    Powershop publishes no deprecation or versioning policy of its own. The
+    policy that governs its endpoints is the DSB's, and it is binding on
+    Powershop by regulation.
+  version_notes_in_spec:
+  - operation: getEnergyPlanDetail
+    note: >-
+      The dailySupplyChargeType field was added in endpoint v3 as part of
+      Standards v1.30.0. In Standards v1.32.0 the description of that field was
+      changed to remove the default value, but it did not result in a new
+      endpoint version.
+  - operation: getEnergyAccountDetail
+    note: >-
+      The dailySupplyChargeType field was added in endpoint v3 as part of
+      Standards v1.30.0; getEnergyAccountDetail is now at endpoint v4.
+status_page: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+status_page_kind: machine-readable CDS Discovery Status endpoint
+status_page_note: >-
+  Powershop runs no human status page — status.powershop.com.au does not resolve
+  in DNS. What it does operate, because the Consumer Data Standards require it,
+  is a machine-readable status surface on its own registered CDR host. Confirmed
+  live on 2026-07-27 returning HTTP 200:
+  {"data":{"status":"OK","updateTime":"2026-07-27T20:25:56.145894714Z","explanation":"All services operational"},"links":{...},"meta":{}}
+  The status enum is defined by the standards as OK / PARTIAL_FAILURE /
+  UNAVAILABLE / SCHEDULED_OUTAGE.
+outages_endpoint: https://public.cdr.powershop.com.au/cds-au/v1/discovery/outages
+outages_note: >-
+  Companion planned-outage feed, also mandated by the standards. Confirmed live
+  on 2026-07-27 returning HTTP 200 with an empty outages array. Scheduled outages
+  are published here with outageTime, duration, isPartial and explanation — this
+  is the CDR equivalent of a maintenance window announcement.
+consumer_facing_outage_pages:
+  note: For retail customers, unrelated to the API surface.
+  urls:
+  - https://www.powershop.com.au/help-centre/outages-faults
+  - https://www.powershop.com.au/faults-and-emergencies
+sla:
+  url: null
+  uptime_target: null
+  note: >-
+    CDR data holders are bound by the DSB non-functional requirements
+    (availability targets, performance thresholds and traffic thresholds) rather
+    than a commercial SLA. Powershop publishes no API SLA of its own, and there
+    is no paid tier to attach one to.
+deprecated_operations: []
+deprecated_operations_note: 'No operation in either specification carries deprecated: true.'
+change_surface:
+  changelog: changelog/powershop-changelog.yml
+  note: Change management is upstream at the Data Standards Body; see the changelog artifact.
+cross_links:
+  conventions: conventions/powershop-conventions.yml
+  conformance: conformance/powershop-conformance.yml

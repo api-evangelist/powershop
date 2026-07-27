@@ -1,0 +1,56 @@
+generated: '2026-07-27'
+method: generated
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json +
+  openapi/powershop-cdr-common-api-openapi.json — every operationId referenced
+  below was verified against the specifications; none was invented.
+note: >-
+  No provider-published Agent Skills or AGENTS.md exists — Powershop runs no
+  developer programme. These are generated from the specifications Powershop
+  implements plus the conventions, errors and lifecycle artifacts in this repo.
+  The split mirrors the reality of the surface: two skills an agent can actually
+  execute today with no credentials, and one that documents the accreditation
+  gate honestly so an agent stops instead of inventing an integration.
+skills:
+- file: powershop-lookup-energy-plans.md
+  name: Look up Powershop energy plans (CDR Generic Tariff)
+  api: openapi/powershop-cdr-energy-api-openapi.json
+  operations: [listEnergyPlans, getEnergyPlanDetail]
+  authenticated: false
+  executable_today: true
+- file: powershop-check-cdr-status.md
+  name: Check Powershop CDR availability before sharing data
+  api: openapi/powershop-cdr-common-api-openapi.json
+  operations: [getStatus, getOutages]
+  authenticated: false
+  executable_today: true
+- file: powershop-share-consumer-energy-data.md
+  name: Share Powershop consumer energy data as an accredited data recipient
+  api: openapi/powershop-cdr-energy-api-openapi.json
+  operations:
+  - getCustomer
+  - getCustomerDetail
+  - listEnergyAccounts
+  - getEnergyAccountDetail
+  - getEnergyAccountBalance
+  - listEnergyAccountBalancesBulk
+  - listEnergyAccountBalancesSpecificAccounts
+  - getEnergyAccountInvoices
+  - listEnergyAccountInvoicesBulk
+  - listEnergyInvoicesForSpecificAccounts
+  - getBillingForEnergyAccount
+  - listEnergyAccountBillingBulk
+  - listEnergyAccountBillingForSpecificAccounts
+  - getEnergyAccountPaymentSchedule
+  - getEnergyAccountConcessions
+  - listElectricityServicePoints
+  - getElectricityServicePointDetail
+  - getElectricityServicePointUsage
+  - listElectricityUsageBulk
+  - listElectricityUsageForServicePoints
+  - getElectricityDERForServicePoint
+  - listElectricityDERBulk
+  - listElectricityDERForSpecificServicePoints
+  authenticated: true
+  gate: accredited-only
+  executable_today: false

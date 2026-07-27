@@ -1,0 +1,68 @@
+generated: '2026-07-27'
+method: searched
+source: live probes of every apis.yml host (Website, baseURL) on 2026-07-27
+summary: >-
+  No /.well-known/ discovery document of any kind is published on any Powershop
+  or Powershop-CDR host, nor on the Australian Energy Regulator CDR host that
+  serves Powershop's generic tariff data. All 27 probes returned 404. This is a
+  complete, honest negative: Powershop publishes no security.txt, no OIDC or
+  OAuth authorisation-server metadata, no api-catalog and no ai-plugin
+  manifest. Consistent with the wider finding that Powershop's only API surface
+  is statutory and it does not expose its CDR identity provider anonymously.
+found: 0
+hosts:
+- host: https://public.cdr.powershop.com.au
+  note: Powershop's own CDR public base URI as registered with the ACCC CDR Register; serves only the CDS Discovery endpoints.
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /openapi.json, status: 404}
+  - {path: /swagger.json, status: 404}
+  - {path: /llms.txt, status: 404}
+- host: https://cdr.energymadeeasy.gov.au
+  note: >-
+    Australian Energy Regulator Energy Made Easy CDR host. Under the energy
+    designation the AER, not the retailer, is the data holder for generic tariff
+    data, so Powershop's 482 plans are served here at /powershop/cds-au/v1.
+    Included because it is a Powershop baseURL host, but it is regulator
+    infrastructure, not Powershop infrastructure.
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /openapi.json, status: 404}
+  - {path: /swagger.json, status: 404}
+  - {path: /llms.txt, status: 404}
+- host: https://www.powershop.com.au
+  note: >-
+    Marketing site. Returns a soft-404 HTML shell (~90 KB) with HTTP 404 status
+    for every probed path — no discovery documents.
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /openapi.json, status: 404}
+  - {path: /swagger.json, status: 404}
+  - {path: /llms.txt, status: 404}
+prior_round_probes:
+  note: >-
+    Round one additionally probed the CDR identity subdomains. Recorded here so
+    a future round does not repeat them.
+  documents:
+  - {url: 'https://auth.cdr.powershop.com.au/.well-known/openid-configuration', status: 404}
+  - {url: 'https://api.cdr.powershop.com.au/.well-known/openid-configuration', status: 0, note: DNS did not resolve}
+  - {url: 'https://id.cdr.powershop.com.au/.well-known/openid-configuration', status: 0, note: DNS did not resolve}
+  - {url: 'https://secure.cdr.powershop.com.au/.well-known/openid-configuration', status: 0, note: DNS did not resolve}
+no_pointer_rationale: >-
+  Nothing was found, so no WellKnown or SecurityTxt pointer is wired into
+  apis.yml. This file exists as the audit record of the negative result.

@@ -1,0 +1,140 @@
+generated: '2026-07-27'
+method: derived
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json +
+  openapi/powershop-cdr-common-api-openapi.json + DSB Consumer Data Standards +
+  live response headers captured from public.cdr.powershop.com.au and
+  cdr.energymadeeasy.gov.au on 2026-07-27
+docs: https://consumerdatastandardsaustralia.github.io/standards/
+summary: >-
+  Cross-cutting request/response semantics for Powershop's Consumer Data Right
+  energy surface, as mandated by the Data Standards Body Consumer Data Standards
+  and confirmed against the live endpoints. Powershop authors none of these
+  conventions — it implements them. Every convention below was either read out of
+  the shared sector OpenAPI or observed on a real Powershop/AER response.
+authentication:
+  style: split
+  public: none — no key, no registration; x-v version header only
+  consented: OAuth 2.0 / OpenID Connect, FAPI profile, mutual TLS, accredited data recipients only
+  cross_link: authentication/powershop-authentication.yml
+versioning:
+  style: header-integer-per-endpoint
+  request_headers:
+  - {name: x-v, required: true, description: Version of the endpoint requested by the client; a positive integer.}
+  - {name: x-min-v, required: false, description: Minimum acceptable endpoint version; the holder serves the highest supported version between x-min-v and x-v.}
+  response_headers:
+  - {name: x-v, description: 'The endpoint version actually served. Observed x-v: 1 on both getStatus and listEnergyPlans.'}
+  unsupported: 406 Not Acceptable — urn:au-cds:error:cds-all:Header/UnsupportedVersion
+  missing: 400 Bad Request — urn:au-cds:error:cds-all:Header/Missing
+  live_evidence:
+  - 'GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/status without x-v -> HTTP 400 {"errors":[{"code":"urn:au-cds:error:cds-all:Header/Missing","title":"Missing Required Header","detail":"x-v header is mandatory for CDR endpoint requests"}]}'
+  - 'GET https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1/energy/plans with x-v: 9 -> HTTP 406 detail "Header x-v greater than maximum supported [x-v=9, max=1]"'
+  cross_link: lifecycle/powershop-lifecycle.yml
+idempotency:
+  supported: false
+  note: >-
+    No idempotency contract exists and none is expected. The entire CDR energy
+    surface is read-only: 21 of 27 operations are GET, and the six POST
+    operations (listElectricityUsageForServicePoints,
+    listElectricityDERForSpecificServicePoints,
+    listEnergyAccountBalancesSpecificAccounts,
+    listEnergyInvoicesForSpecificAccounts,
+    listEnergyAccountBillingForSpecificAccounts) use POST only to carry a list of
+    IDs in a request body for a bulk *query* — they create and mutate nothing.
+    The Consumer Data Standards define no Idempotency-Key header, and neither
+    OpenAPI declares one. No Idempotency pointer is wired in apis.yml because
+    there is genuinely nothing to point at.
+pagination:
+  style: page-number
+  request_params:
+  - {name: page, default: 1, description: Page of results to request (standard pagination).}
+  - {name: page-size, default: 25, description: Page size to request; default 25.}
+  response_fields:
+    meta: [totalRecords, totalPages]
+    links: [self, first, prev, next, last]
+  schemas: [MetaPaginated, LinksPaginated]
+  live_evidence: >-
+    GET .../energy/plans?page-size=1 returned meta {totalRecords: 482, totalPages: 482}
+    and links {self, next, last} with fully-qualified page URIs.
+  out_of_range: 422 Unprocessable Entity — urn:au-cds:error:cds-all:Field/InvalidPage
+filtering:
+  listEnergyPlans:
+  - {name: type, values: [STANDING, MARKET, REGULATED, ALL], default: ALL}
+  - {name: fuelType, values: [ELECTRICITY, GAS, DUAL, ALL], default: ALL}
+  - {name: effective, values: [CURRENT, FUTURE, ALL], default: CURRENT}
+  - {name: updated-since, description: Delta polling — only plans updated after this date-time.}
+  - {name: brand, description: Filter on the brand field.}
+  listEnergyAccounts:
+  - {name: open-status, values: [ALL, CLOSED, OPEN], default: ALL}
+  getElectricityServicePointUsage:
+  - {name: oldest-date, description: Records with effective date at or after this date.}
+  - {name: newest-date, description: Records with effective date at or before this date.}
+  - {name: interval-reads, values: [NONE, MIN_30, FULL], default: NONE}
+request_tracing:
+  header: x-fapi-interaction-id
+  description: >-
+    RFC 4122 UUID correlation id. If the data recipient supplies one the data
+    holder must play it back; if not, the holder generates one and returns it.
+  scope: >-
+    Declared as an optional request parameter on every authenticated energy
+    operation. Also observed on the anonymous AER tariff surface — response
+    header x-fapi-interaction-id: 5b0b7378-87a9-4067-9074-11e1c18fdc4c on
+    GET /energy/plans, so tracing is available even without a consent.
+  additional_fapi_headers:
+  - {name: x-fapi-auth-date, description: When the customer last logged in to the data recipient software product.}
+  - {name: x-fapi-customer-ip-address, description: The customer's original IP address when the customer is present.}
+  - {name: x-cds-client-headers, description: The customer's original HTTP headers, Base64 encoded.}
+error_envelope:
+  media_type: application/json
+  schema: ResponseErrorListV2
+  shape: '{ errors: [ { code, title, detail, meta? } ] }'
+  code_namespace: urn:au-cds:error:cds-all / urn:au-cds:error:cds-energy
+  rfc9457: false
+  note: CDR does not use RFC 9457 application/problem+json.
+  cross_link: errors/powershop-problem-types.yml
+rate_limit_signaling:
+  documented_in_spec: false
+  retry_after: >-
+    The AER host advertises Retry-After in access-control-expose-headers
+    (x-v, Retry-After, x-fapi-interaction-id), so a 429 would carry a Retry-After
+    value, but no quota headers were observed on a successful response and no
+    published limit was found.
+  note: >-
+    The Consumer Data Standards define non-functional requirements and traffic
+    thresholds for authenticated CDR calls (session and unattended call rates per
+    consumer per data recipient). Powershop publishes no rate-limit page of its
+    own.
+cors:
+  enabled: true
+  observed:
+    public.cdr.powershop.com.au:
+      access-control-allow-origin: '*'
+      access-control-allow-headers: Range,x-v,x-min-v
+      access-control-expose-headers: Content-Length,x-v,x-min-v
+      access-control-max-age: '3600'
+    cdr.energymadeeasy.gov.au:
+      access-control-allow-origin: '*'
+      access-control-expose-headers: x-v, Retry-After, x-fapi-interaction-id
+security_headers:
+  observed_on_public_cdr_powershop:
+    strict-transport-security: max-age=63072000; includeSubDomains;
+    x-content-type-options: nosniff
+    x-frame-options: DENY
+  cross_link: security/powershop-domain-security.yml
+data_conventions:
+  envelope: 'Every response is { data, links, meta } — the CDS response envelope.'
+  dates: ISO 8601 DateTimeString / DateString (x-cds-type extensions)
+  amounts: AmountString — string-encoded decimal
+  currency: CurrencyString — ISO 4217
+  natural_numbers: x-cds-type NaturalNumber for counts
+  identifiers: >-
+    planId, accountId and servicePointId are opaque ASCII strings scoped to the
+    data holder. Powershop plan IDs observed in the live payload carry a
+    PSH<digits><letters>@EME shape (e.g. PSH1060421MRE2@EME) — the @EME suffix
+    reflects the Energy Made Easy host that serves them.
+cross_links:
+  errors: errors/powershop-problem-types.yml
+  lifecycle: lifecycle/powershop-lifecycle.yml
+  authentication: authentication/powershop-authentication.yml
+  scopes: scopes/powershop-scopes.yml
+  conformance: conformance/powershop-conformance.yml

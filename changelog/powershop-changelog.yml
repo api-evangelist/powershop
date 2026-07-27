@@ -1,0 +1,74 @@
+generated: '2026-07-27'
+method: searched
+source: https://github.com/ConsumerDataStandardsAustralia/standards/releases
+first_party: false
+first_party_note: >-
+  Powershop publishes no changelog, no release notes and no API version history
+  of its own — it has no developer programme to publish them to. The change
+  surface for the API Powershop actually serves is the Data Standards Body's
+  release train, which is binding on Powershop by regulation. That train is
+  captured here, clearly attributed, exactly as this repo stores the DSB's
+  OpenAPI documents as the contract Powershop implements.
+scheme: semver-on-the-standards
+authority: Data Standards Body (Treasury, Australia)
+current_version: 1.36.0
+current_version_note: >-
+  The version of the Consumer Data Standards the two OpenAPI documents in this
+  repo were harvested at. Endpoint-level versions are negotiated separately per
+  request via x-v — see lifecycle/powershop-lifecycle.yml.
+process: >-
+  Change is governed through numbered maintenance iterations and binding
+  Decisions published by the Data Standards Body, with future-dated obligation
+  milestones data holders must meet. Retailers do not choose when to adopt.
+entries:
+- version: 1.36.0
+  date: '2024-12-04'
+  summary: Changes from Decision 376 (White label brand arrangements).
+  energy_impact: none
+  highlights:
+  - Security profile — updated the Organization (O) field for the server in the Certificate Signing Request profile.
+  - Security profile — added a ProductBaseUri row to the Participant Endpoints table.
+  - Register APIs — added brandGroup and productBaseUri fields to the Get Data Holder Brands endpoints.
+  - Banking APIs — added brandGroup to the Banking PRD endpoints.
+  breaking: false
+- version: 1.35.1
+  date: '2024-10-08'
+  summary: Changes from Decision 377 (amendments to the certificate management section).
+  breaking: false
+- version: 1.35.0
+  date: '2024-07-29'
+  summary: Maintenance iteration 22 plus three additional decisions affecting non-bank lending, BNPL, app redirects and obligation dates.
+  breaking: false
+- version: 1.34.1
+  date: '2024-04-11'
+  summary: Updated candidate standards for the banking and non-bank lending sectors.
+  breaking: false
+- version: 1.34.0
+  date: '2024-03-13'
+  summary: Changes from Decision 338 (updates to Banking Products and Accounts) and Decision 361.
+  breaking: false
+- version: 1.33.1
+  date: '2024-03-06'
+  summary: OpenAPI specification refactoring.
+  breaking: false
+- version: 1.33.0
+  date: '2023-12-18'
+  summary: Changes from Decision 356 (Maintenance Iteration 21) and Decision 350 (August 2024 Rules).
+  breaking: false
+- version: 1.32.0
+  date: '2023-10-21'
+  summary: >-
+    Changes from Maintenance Iteration 20. Relevant to energy: the description of
+    the dailySupplyChargeType field was changed to remove the default value,
+    without producing a new endpoint version — noted inline in the
+    getEnergyPlanDetail and getEnergyAccountDetail specifications.
+  energy_impact: documentation
+  breaking: false
+window_note: >-
+  Recent window only — the live release feed is the source of truth. Dates are
+  the GitHub release publication dates.
+release_feed: https://github.com/ConsumerDataStandardsAustralia/standards/releases
+release_notes_example: https://consumerdatastandardsaustralia.github.io/standards/includes/releasenotes/releasenotes.1.36.0.html
+cross_links:
+  lifecycle: lifecycle/powershop-lifecycle.yml
+  conformance: conformance/powershop-conformance.yml

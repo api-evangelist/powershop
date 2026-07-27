@@ -1,0 +1,67 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  npm registry search, PyPI, RubyGems, GitHub repository search, and the
+  powershop.com.au site — probed 2026-07-27
+summary: >-
+  Powershop Australia publishes no client library in any language, in any
+  registry. This is the expected result: it runs no developer programme, issues
+  no credentials, and its only API surface is a statutory CDR obligation
+  implemented against a shared sector specification. No SDKs pointer is wired in
+  apis.yml, because there is no SDK.
+packages: []
+searched_registries:
+- {registry: npm, query: powershop, results: 0}
+- {registry: pypi, query: powershop, status: 404}
+- {registry: pypi, query: powershop-api, status: 404}
+- {registry: rubygems, query: powershop, results: 1, first_party: false}
+- {registry: github, query: 'powershop in:name', results: 15, first_party: 0}
+excluded:
+  reason: >-
+    Every library found under the Powershop name belongs to Powershop NEW
+    ZEALAND, a separate business retained by Meridian Energy when Shell acquired
+    the Australian business in February 2022. They describe the legacy Flux
+    Federation Powershop NZ API and are not an Australian Powershop product.
+    Recorded here so a future enrichment round does not wire them as Powershop
+    Australia SDKs.
+  items:
+  - name: powershop
+    registry: rubygems
+    description: Allows Ruby applications to communicate with the Powershop API
+    market: New Zealand (legacy Flux Federation)
+    official_for_powershop_australia: false
+  - name: fluxfederation/powershop-api
+    registry: github
+    archived: true
+    description: Old Powershop API documentation, libraries and sample code
+    market: New Zealand (legacy Flux Federation)
+    official_for_powershop_australia: false
+  - name: nikz/powershop
+    registry: github
+    description: Powershop API Client for Ruby
+    market: New Zealand (community)
+    official_for_powershop_australia: false
+  - name: mogest/powershop_api_v4_sample
+    registry: github
+    archived: true
+    description: A sample app to experiment with the new v4 Powershop API
+    market: New Zealand (community)
+    official_for_powershop_australia: false
+  - name: SheaSmith/ha-powershop
+    registry: github
+    description: Home Assistant integration for Powershop
+    market: New Zealand (community)
+    official_for_powershop_australia: false
+  - name: PMKA/powershop-nz
+    registry: github
+    description: A Home Assistant Community Addon for retrieving your Powershop data
+    market: New Zealand (community)
+    official_for_powershop_australia: false
+github_organisation:
+  exists: false
+  evidence: 'https://api.github.com/orgs/powershop returned 404'
+what_to_use_instead: >-
+  For the open tariff surface, any HTTP client will do — one GET with an x-v
+  header. For the consented surface, accredited data recipients integrate through
+  their own CDR client stack against the shared Consumer Data Standards; there is
+  nothing Powershop-specific to install.

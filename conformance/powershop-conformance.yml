@@ -1,0 +1,139 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json +
+  openapi/powershop-cdr-common-api-openapi.json + DSB Consumer Data Standards +
+  ACCC CDR Register entry + live conformance probes on 2026-07-27
+summary: >-
+  Powershop conforms to exactly one standard, and it conforms to it because a
+  statute made it. There is no voluntary standards posture here: no Green Button
+  / ESPI, no OpenADR, no IEEE 2030.5, no OCPP/OCPI, no IEC CIM, no published
+  certification programme. What there is, is a verified Consumer Data Right
+  energy implementation confirmed by three independent anonymous HTTP checks.
+standards:
+- id: au-cdr-consumer-data-standards
+  conforms: true
+  version: 1.36.0
+  evidence: >-
+    Powershop is listed on the public ACCC CDR Register as an energy data holder
+    (dataHolderBrandId 6aaeaf9b-5132-ee11-a83d-000d3a8830d6, ABN 41154914075)
+    with publicBaseUri https://public.cdr.powershop.com.au, and that base URI
+    returns standards-conformant CDS responses.
+  source: https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary
+- id: cdr-energy-sector-designation
+  conforms: true
+  evidence: >-
+    Designated energy data holder under the CDR energy sector rollout; Powershop's
+    own CDR policy names the customer, account, invoice/billing and AEMO-sourced
+    metering, NMI standing and DER data it shares.
+  source: https://www.powershop.com.au/privacy-policy/cdr-policy
+- id: cds-common-discovery
+  conforms: true
+  evidence: >-
+    GET /cds-au/v1/discovery/status and /cds-au/v1/discovery/outages both
+    returned HTTP 200 with the CDS data/links/meta envelope and an x-v:1
+    response header on 2026-07-27.
+- id: cds-energy-generic-tariff
+  conforms: true
+  evidence: >-
+    GET /energy/plans on the AER Energy Made Easy CDR host returned HTTP 200 with
+    meta.totalRecords 482 for brand "powershop"; getEnergyPlanDetail returned 200
+    for planId PSH1060421MRE2@EME.
+  caveat: >-
+    Served by the Australian Energy Regulator, not by Powershop. Under the energy
+    designation the AER is the data holder for generic tariff data. Powershop's
+    own host returns 404 for /energy/plans — the split is by design.
+- id: cds-energy-consumer-data
+  conforms: true
+  verified: structurally
+  evidence: >-
+    The account, balance, invoice, billing, payment-schedule, concession,
+    service-point, usage and DER resources are mandated and documented, and
+    Powershop's CDR policy enumerates the matching data clusters, but the surface
+    could not be exercised without ACCC accreditation and mutual TLS. Asserted as
+    conformant on the register + policy + standards basis, not on a successful
+    authenticated call.
+- id: header-integer-versioning
+  conforms: true
+  evidence: >-
+    Mandatory x-v / optional x-min-v request headers; 400 Header/Missing when
+    absent and 406 Header/UnsupportedVersion when unsupported, both provoked live.
+- id: page-number-pagination
+  conforms: true
+  evidence: >-
+    page / page-size query params with meta.totalRecords and meta.totalPages and
+    RFC 5988-style self/first/prev/next/last links, observed live on /energy/plans.
+- id: fapi-interaction-id-tracing
+  conforms: true
+  evidence: >-
+    x-fapi-interaction-id declared on every authenticated operation and observed
+    as a response header on the anonymous AER tariff surface.
+- id: oauth2-oidc
+  conforms: true
+  scope: consented surface only
+  evidence: >-
+    Required by the CDS security profile for accredited data recipients. Neither
+    OpenAPI declares securitySchemes, and Powershop does not expose OpenID
+    Provider metadata anonymously (/.well-known/openid-configuration returned 404
+    on public. and auth. hosts; api./id./secure. do not resolve), so the profile
+    is asserted from the standards, not read from a discovery document.
+- id: fapi
+  conforms: true
+  scope: consented surface only
+  evidence: Mandated by the CDS security profile for the CDR data-sharing surface.
+  caveat: Could not be confirmed directly because the identity provider metadata is not anonymously reachable.
+- id: mutual-tls
+  conforms: true
+  scope: consented surface only
+  evidence: CDR Register-issued transport certificates are required for data recipient calls to the authenticated base URI.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    Errors use the CDR ResponseErrorListV2 shape with urn:au-cds error codes over
+    application/json, not application/problem+json.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: No Sunset or Deprecation header support; CDR versions endpoints by integer instead.
+- id: idempotency-key
+  conforms: false
+  evidence: >-
+    Not applicable — the surface is read-only. The Consumer Data Standards define
+    no idempotency-key contract and neither specification declares one.
+- id: green-button-espi
+  conforms: false
+  evidence: No reference found anywhere on powershop.com.au or in its CDR surface.
+- id: openadr
+  conforms: false
+  evidence: No reference found. Powershop is a retailer with no demand-response API programme.
+- id: ieee-2030-5
+  conforms: false
+  evidence: No reference found.
+- id: ocpp-ocpi
+  conforms: false
+  evidence: >-
+    No reference found. Powershop sells EV Day / EV Night electricity plans but
+    operates no charging network API.
+- id: iec-cim
+  conforms: false
+  evidence: No reference found. Powershop owns no network or generation assets.
+- id: asyncapi
+  conforms: false
+  evidence: No event, streaming or webhook surface exists — nothing to describe.
+certifications_published: false
+certifications_note: >-
+  Powershop publishes no trust centre, no SOC 2 / ISO 27001 / PCI DSS
+  attestation, and no security certification page. A live probe for trust and
+  security pages found nothing, so no Compliance pointer is wired in apis.yml.
+  The only third-party assurance in play is the ACCC accreditation regime, which
+  binds the data recipients calling Powershop rather than Powershop itself.
+regulatory_context:
+  regime: Consumer Data Right (Australia) — energy sector designation
+  regulators:
+  - Australian Competition and Consumer Commission (ACCC) — CDR Register and accreditation
+  - Office of the Australian Information Commissioner (OAIC) — privacy safeguards
+  - Data Standards Body (DSB), Treasury — Consumer Data Standards
+  - Australian Energy Regulator (AER) — data holder for generic tariff data
+  - Australian Energy Market Operator (AEMO) — secondary data holder for metering, NMI standing and DER data
+  legal_entity: Powershop Australia Pty Ltd
+  abn: '41154914075'
+  parent: Shell Energy Australia (Shell plc)

@@ -1,0 +1,174 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json and
+  openapi/powershop-cdr-common-api-openapi.json (the "error codes MUST be
+  supported" list declared on every 400/404/406/422 response) + live error
+  payloads provoked against the Powershop and AER CDR hosts on 2026-07-27
+format: cds-error-list
+rfc9457: false
+envelope:
+  media_type: application/json
+  schema: ResponseErrorListV2
+  shape: '{ errors: [ { code, title, detail, meta? } ] }'
+  code_namespace: urn:au-cds:error:cds-all and urn:au-cds:error:cds-energy
+  note: >-
+    CDR does not use RFC 9457 application/problem+json. Errors are returned as a
+    ResponseErrorListV2 object carrying an array of ErrorV2 items. `code` is the
+    machine-readable urn discriminator, `title` is the fixed human label
+    mandated by the standards, `detail` is holder-specific free text.
+verified_live:
+  note: >-
+    Four error cases were provoked against the live endpoints rather than read
+    out of the specification. The urn code strings below are quoted from those
+    real responses.
+  cases:
+  - request: GET https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1/energy/plans?page-size=1 with no x-v header
+    status: 400
+    body: '{"errors":[{"code":"urn:au-cds:error:cds-all:Header/Missing","title":"Missing Required Header","detail":"Header x-v must be provided"}]}'
+  - request: GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/status with no x-v header
+    status: 400
+    body: '{"errors":[{"code":"urn:au-cds:error:cds-all:Header/Missing","title":"Missing Required Header","detail":"x-v header is mandatory for CDR endpoint requests"}]}'
+  - request: 'GET https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1/energy/plans?page-size=1 with x-v: 9'
+    status: 406
+    body: '{"errors":[{"code":"urn:au-cds:error:cds-all:Header/UnsupportedVersion","title":"Unsupported Version","detail":"Header x-v greater than maximum supported [x-v=9, max=1]"}]}'
+  - request: 'GET https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1/energy/plans/NOTAPLAN with x-v: 3'
+    status: 404
+    body: '{"errors":[{"code":"urn:au-cds:error:cds-all:Resource/NotFound","title":"Resource Not Found"}]}'
+    note: >-
+      The specification declares "404 - Invalid Resource" for getEnergyPlanDetail;
+      the AER implementation answers with Resource/NotFound. Recorded as observed.
+code_strings_caveat: >-
+  Only the four urn strings above were observed on the wire. For the remaining
+  entries the title and the standards anchor are quoted verbatim from the
+  OpenAPI response description; the urn is given only where the anchor maps
+  unambiguously onto the cds-all namespace, and is left null for the
+  energy-specific codes rather than guessed.
+problems:
+- status: 400
+  title: Invalid Field
+  anchor: error-400-field-invalid
+  code: urn:au-cds:error:cds-all:Field/Invalid
+  operations_declaring: 27
+  applies_to: all operations
+- status: 400
+  title: Missing Required Field
+  anchor: error-400-field-missing
+  code: urn:au-cds:error:cds-all:Field/Missing
+  operations_declaring: 27
+  applies_to: all operations
+- status: 400
+  title: Invalid Version
+  anchor: error-400-header-invalid-version
+  code: urn:au-cds:error:cds-all:Header/InvalidVersion
+  operations_declaring: 27
+  remediation: x-v (and x-min-v when supplied) must be positive integers.
+- status: 400
+  title: Missing Required Header
+  anchor: null
+  code: urn:au-cds:error:cds-all:Header/Missing
+  verified_live: true
+  remediation: Supply the mandatory x-v version header on every CDR request.
+  note: Not declared per-operation in the spec but returned by both live hosts when x-v is omitted.
+- status: 400
+  title: Invalid Date
+  anchor: error-400-field-invalid-date-time
+  code: urn:au-cds:error:cds-all:Field/InvalidDateTime
+  operations_declaring: 10
+  remediation: Date and date-time query parameters must be ISO 8601 DateString / DateTimeString.
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#getElectricityServicePointUsage
+- status: 400
+  title: Invalid Page Size
+  anchor: error-400-field-invalid-page-size
+  code: urn:au-cds:error:cds-all:Field/InvalidPageSize
+  operations_declaring: 16
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#listEnergyPlans
+- status: 404
+  title: Invalid Resource
+  anchor: error-404-resource-invalid
+  code: urn:au-cds:error:cds-all:Resource/Invalid
+  operations_declaring: 1
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#getEnergyPlanDetail
+  observed_instead: 'urn:au-cds:error:cds-all:Resource/NotFound (title "Resource Not Found") on the live AER host'
+- status: 404
+  title: Invalid Energy Account
+  anchor: error-404-invalid-energy-account
+  code: null
+  operations_declaring: 6
+  applies_to: consented surface
+  remediation: The accountId is not an account the consumer authorised for sharing.
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#getEnergyAccountDetail
+- status: 404
+  title: Unavailable Energy Account
+  anchor: error-404-unavailable-energy-account
+  code: null
+  operations_declaring: 6
+  applies_to: consented surface
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#getEnergyAccountBalance
+- status: 404
+  title: Invalid Service Point
+  anchor: error-404-invalid-service-point
+  code: null
+  operations_declaring: 3
+  applies_to: consented surface
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#getElectricityServicePointDetail
+- status: 404
+  title: Unavailable Service Point
+  anchor: error-404-unavailable-service-point
+  code: null
+  operations_declaring: 3
+  applies_to: consented surface
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#getElectricityDERForServicePoint
+- status: 406
+  title: Unsupported Version
+  anchor: error-406-header-unsupported-version
+  code: urn:au-cds:error:cds-all:Header/UnsupportedVersion
+  verified_live: true
+  operations_declaring: 27
+  remediation: >-
+    Request a supported endpoint version via x-v / x-min-v. The live AER tariff
+    host reports max=1 for listEnergyPlans.
+- status: 422
+  title: Invalid Page
+  anchor: error-422-field-invalid-page
+  code: urn:au-cds:error:cds-all:Field/InvalidPage
+  operations_declaring: 16
+  remediation: The requested page is out of range for the current result set.
+- status: 422
+  title: Invalid Energy Account
+  anchor: error-422-invalid-energy-account
+  code: null
+  operations_declaring: 3
+  applies_to: consented bulk POST operations
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#listEnergyAccountBalancesSpecificAccounts
+- status: 422
+  title: Unavailable Energy Account
+  anchor: error-422-unavailable-energy-account
+  code: null
+  operations_declaring: 3
+  applies_to: consented bulk POST operations
+- status: 422
+  title: Invalid Service Point
+  anchor: error-422-invalid-service-point
+  code: null
+  operations_declaring: 2
+  applies_to: consented bulk POST operations
+  source_operation: openapi/powershop-cdr-energy-api-openapi.json#listElectricityUsageForServicePoints
+- status: 422
+  title: Unavailable Service Point
+  anchor: error-422-unavailable-service-point
+  code: null
+  operations_declaring: 2
+  applies_to: consented bulk POST operations
+response_coverage:
+  note: HTTP status codes declared across the 27 operations in the two specifications.
+  operations: 27
+  '200': 27
+  '400': 27
+  '404': 10
+  '406': 27
+  '422': 16
+cross_links:
+  conventions: conventions/powershop-conventions.yml
+  authentication: authentication/powershop-authentication.yml
+  standards: https://consumerdatastandardsaustralia.github.io/standards/#error-codes

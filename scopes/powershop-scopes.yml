@@ -1,0 +1,130 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  openapi/powershop-cdr-energy-api-openapi.json and
+  openapi/powershop-cdr-common-api-openapi.json (x-scopes extension declared
+  per operation) + DSB Consumer Data Standards authorisation scopes
+docs: https://consumerdatastandardsaustralia.github.io/standards/#authorisation-scopes
+summary: >-
+  OAuth 2.0 authorisation scopes governing the consented, accreditation-gated
+  half of Powershop's Consumer Data Right obligation. These are the standard
+  Data Standards Body CDR energy and common scopes, declared per-operation in
+  the shared sector OpenAPI via the x-scopes extension — Powershop defines no
+  proprietary scopes and publishes no scope documentation of its own. They apply
+  to the OpenID Connect / FAPI authorisation flow brokered by an ACCC accredited
+  data recipient, NOT to the public unauthenticated surfaces: the CDS Discovery
+  endpoints (getStatus, getOutages) and the Generic Tariff endpoints
+  (listEnergyPlans, getEnergyPlanDetail) declare no x-scopes and require none.
+flow:
+  grant: authorization_code
+  profile: FAPI / OpenID Connect with PAR, JARM and mutual-TLS sender-constrained tokens
+  registry: CDR Register (ACCC) / Data Standards Body security profile
+  cross_link: authentication/powershop-authentication.yml
+schemes: []
+schemes_note: >-
+  Neither shared CDS OpenAPI declares components.securitySchemes, so no oauth2
+  flow object with authorizationUrl/tokenUrl can be derived. Powershop's
+  authorisation and token endpoints are not published anonymously; they are
+  resolved through the CDR Register by accredited participants.
+scopes:
+- scope: energy:accounts.basic:read
+  description: >-
+    Read basic energy account information — account ID, account number, display
+    name, open/closed status, creation date, and the plan(s) and service point
+    IDs attached to each account.
+  operations: [listEnergyAccounts]
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:accounts.detail:read
+  description: >-
+    Read detailed energy account information — the full plan detail per account
+    including fuel type, contingent-plan flag, metering charges, and the gas and
+    electricity contract terms, plus authorised contacts.
+  operations: [getEnergyAccountDetail]
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:accounts.concessions:read
+  description: >-
+    Read concessions and rebates applied to the account — type, display name,
+    discount frequency, amount or percentage, applicability period and what the
+    concession is applied to.
+  operations: [getEnergyAccountConcessions]
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:accounts.paymentschedule:read
+  description: >-
+    Read the payment schedule for an account — amount and method (card debit,
+    direct debit, digital wallet or manual payment) with payment frequency and
+    calculation type.
+  operations: [getEnergyAccountPaymentSchedule]
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:billing:read
+  description: >-
+    Read account balances, invoices and billing transactions — including usage,
+    demand, once-off, other-charge and payment transaction types, invoice
+    periods, GST and pay-on-time discounts.
+  operations:
+  - getEnergyAccountBalance
+  - listEnergyAccountBalancesBulk
+  - listEnergyAccountBalancesSpecificAccounts
+  - getEnergyAccountInvoices
+  - listEnergyAccountInvoicesBulk
+  - listEnergyInvoicesForSpecificAccounts
+  - getBillingForEnergyAccount
+  - listEnergyAccountBillingBulk
+  - listEnergyAccountBillingForSpecificAccounts
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:electricity.servicepoints.basic:read
+  description: >-
+    Read basic electricity service point data — the NMI-level service point list
+    the consumer has authorised.
+  operations: [listElectricityServicePoints]
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:electricity.servicepoints.detail:read
+  description: >-
+    Read detailed electricity service point data — NMI standing data sourced
+    from AEMO as secondary data holder.
+  operations: [getElectricityServicePointDetail]
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:electricity.usage:read
+  description: >-
+    Read interval metering (usage) data for authorised service points, sourced
+    from AEMO as secondary data holder.
+  operations:
+  - getElectricityServicePointUsage
+  - listElectricityUsageBulk
+  - listElectricityUsageForServicePoints
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: energy:electricity.der:read
+  description: >-
+    Read Distributed Energy Resource (rooftop solar, inverter and battery)
+    register data for authorised service points — approved capacity, phase
+    counts, islandable installation, protection mode, AC connections and DER
+    devices. Sourced from the AEMO DER register.
+  operations:
+  - getElectricityDERForServicePoint
+  - listElectricityDERBulk
+  - listElectricityDERForSpecificServicePoints
+  sources: [openapi/powershop-cdr-energy-api-openapi.json]
+- scope: common:customer.basic:read
+  description: >-
+    Read basic customer information — name or business/organisation name for the
+    authorising consumer.
+  operations: [getCustomer]
+  sources: [openapi/powershop-cdr-common-api-openapi.json]
+- scope: common:customer.detail:read
+  description: >-
+    Read detailed customer information — contact details, supply address, and
+    for business customers the business name and ABN.
+  operations: [getCustomerDetail]
+  sources: [openapi/powershop-cdr-common-api-openapi.json]
+unscoped_operations:
+  note: Public endpoints that declare no x-scopes and require no authorisation.
+  operations: [listEnergyPlans, getEnergyPlanDetail, getStatus, getOutages]
+data_clusters_per_powershop_policy:
+  source: https://www.powershop.com.au/privacy-policy/cdr-policy
+  note: >-
+    Powershop's own CDR policy names the data it shares in consumer language,
+    which maps onto the scopes above.
+  clusters:
+  - Customer data — name, contact details, supply address, business name, ABN
+  - Account data — account number, creation date, identifiers, product data, payment arrangements, concessions and rebates
+  - Invoice and billing data
+  - AEMO data — metering (usage) data, NMI standing data, DER (solar) register data

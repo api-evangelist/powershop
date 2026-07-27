@@ -1,0 +1,53 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Powershop CDR Common
+  version: 1.0.0
+extends: openapi/powershop-cdr-common-api-openapi.json
+x-apievangelist-note: >-
+  The extended document is the Data Standards Body's shared CDR Common API
+  specification, stored verbatim. This overlay records API Evangelist's
+  verification of Powershop's implementation of the two Discovery operations on
+  its own registered CDR host, and marks the two customer operations as
+  accreditation-gated. The original spec is never mutated.
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: powershop
+    x-apievangelist-provider-name: Powershop
+    x-apievangelist-regime: Consumer Data Right (Australia) — energy sector designation
+    x-apievangelist-spec-authored-by: Data Standards Body (Treasury, Australia)
+    x-apievangelist-spec-first-party: false
+    x-apievangelist-verified: '2026-07-27'
+- target: $.servers
+  update:
+  - description: >-
+      Powershop's own registered CDR public base URI, as advertised in the ACCC
+      CDR Register. Carries the Discovery endpoints only.
+    url: https://public.cdr.powershop.com.au/cds-au/v1
+    x-apievangelist-authenticated: false
+    x-apievangelist-verified-live: true
+- target: $.paths['/discovery/status'].get
+  update:
+    x-apievangelist-live: true
+    x-apievangelist-authenticated: false
+    x-apievangelist-url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+    x-apievangelist-note: >-
+      Confirmed HTTP 200 on 2026-07-27 returning
+      {"data":{"status":"OK","updateTime":"2026-07-27T20:25:56.145894714Z","explanation":"All services operational"}}
+      with an x-v:1 response header. This is Powershop's only status surface —
+      status.powershop.com.au does not resolve.
+- target: $.paths['/discovery/outages'].get
+  update:
+    x-apievangelist-live: true
+    x-apievangelist-authenticated: false
+    x-apievangelist-url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/outages
+    x-apievangelist-note: Confirmed HTTP 200 on 2026-07-27 with an empty outages array.
+- target: $.paths['/common/customer'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [common:customer.basic:read]
+    x-apievangelist-note: Returns 404 on the public base URI — served only from the authenticated data-holder base URI.
+- target: $.paths['/common/customer/detail'].get
+  update:
+    x-apievangelist-gate: accredited-only
+    x-apievangelist-scopes: [common:customer.detail:read]
