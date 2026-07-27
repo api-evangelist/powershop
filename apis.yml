@@ -1,0 +1,151 @@
+aid: powershop
+url: https://raw.githubusercontent.com/api-evangelist/powershop/refs/heads/main/apis.yml
+name: Powershop
+kind: company
+description: >-
+  Powershop is an Australian retail energy brand selling electricity in New South Wales, Victoria,
+  south-east Queensland and South Australia, and gas in New South Wales and Victoria. It is operated by
+  Powershop Australia Pty Ltd (ABN 41 154 914 075), a wholly owned Shell Energy Australia business since
+  Shell completed its acquisition from Meridian Energy in February 2022. Powershop sits at the retail end
+  of the energy value chain — it buys wholesale, bills the customer, and owns the customer relationship —
+  and is known for its "Powerpacks" prepay purchasing model, GreenPower add-on, and EV Day/EV Night plans.
+  Its API posture is entirely regulatory, not commercial: Powershop publishes NO first-party developer
+  portal, no API keys, and no self-serve documentation, and has publicly said since 2017 that it has no
+  public API. What it does have is a verified Consumer Data Right (CDR) energy implementation. Powershop is
+  a designated CDR energy data holder listed live on the ACCC CDR Register with a public base URI of
+  https://public.cdr.powershop.com.au, which returns standards-conformant Consumer Data Standards responses
+  for /cds-au/v1/discovery/status and /cds-au/v1/discovery/outages without authentication. Its Generic
+  Tariff (plan) data is served openly and anonymously from the Australian Energy Regulator's Energy Made
+  Easy CDR host, where 482 Powershop electricity and gas plans are retrievable with no credentials at all.
+  The customer-level data the mandate actually exists to unlock — accounts, billing, invoices, payment
+  schedules, concessions, plus AEMO-sourced metering, NMI standing and DER register data — is real,
+  documented, and reachable only by an accredited data recipient acting on an authenticated consumer
+  consent. Open tariff data, closed consumer data: a mandate that was implemented, not merely claimed.
+image: https://www.powershop.com.au/powershop-logo.png
+tags:
+- Energy
+- Australia
+- Utilities
+- Electricity
+- Gas
+- Consumer Data Right
+- Energy Retail
+- Smart Metering
+- Solar
+- Tariffs
+- Open Data
+created: '2026-07-27'
+modified: '2026-07-27'
+specificationVersion: '0.19'
+apis:
+- aid: powershop:powershop-cdr-generic-tariff-api
+  name: Powershop CDR Generic Tariff (Energy Plans) API
+  description: >-
+    The public, unauthenticated Consumer Data Right Generic Tariff API carrying every Powershop retail
+    energy plan. Under the CDR energy designation the Australian Energy Regulator — not the retailer — is
+    the data holder for generic tariff data, so Powershop's plan data is served from the AER's Energy Made
+    Easy CDR host rather than from Powershop's own infrastructure. Confirmed live on 2026-07-27:
+    GET /cds-au/v1/energy/plans returned HTTP 200 with meta.totalRecords 482 — 416 electricity and 66 gas
+    plans, 313 MARKET and 169 STANDING, 297 residential and 185 business — spanning the Ausgrid, Endeavour,
+    Essential Energy, Jemena, Citipower, Powercor, United Energy, AusNet, Multinet, Energex, SA Power
+    Networks and Australian Gas Networks distribution zones. GET /cds-au/v1/energy/plans/{planId} returned
+    HTTP 200 for planId PSH1060421MRE2@EME. No API key, no registration, no accreditation required.
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Energy
+  - Tariffs
+  - Consumer Data Right
+  - Open Data
+  - Electricity
+  - Gas
+  - Australia
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-cdr-energy-api-openapi.json
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+- aid: powershop:powershop-cdr-discovery-api
+  name: Powershop CDR Discovery API
+  description: >-
+    The Consumer Data Standards Discovery endpoints served from Powershop's own registered CDR public base
+    URI. This is the surface that proves the implementation exists rather than merely being designated.
+    Confirmed live on 2026-07-27 with no authentication:
+    GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/status returned HTTP 200 with
+    {"data":{"status":"OK","explanation":"All services operational"}}, and
+    GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/outages returned HTTP 200 with an empty
+    outages array. Both responses carry the CDS data/links/meta envelope. The root path and
+    /cds-au/v1/energy/plans on this host both return HTTP 404, confirming that Powershop's own public base
+    URI carries only the Discovery endpoints and that tariff data lives with the regulator.
+  humanURL: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  baseURL: https://public.cdr.powershop.com.au/cds-au/v1
+  tags:
+  - Energy
+  - Consumer Data Right
+  - Discovery
+  - Status
+  - Australia
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-cdr-common-api-openapi.json
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+- aid: powershop:powershop-cdr-energy-consumer-data-api
+  name: Powershop CDR Energy Consumer Data API
+  description: >-
+    The consented, accreditation-gated half of Powershop's Consumer Data Right obligation. Powershop's own
+    published CDR policy names the data it shares — customer data, account data (account number, creation
+    date, product data, payment arrangements, concessions and rebates), invoice and billing data, and
+    AEMO-sourced data comprising metering usage data, NMI standing data and DER (solar) register data —
+    which maps onto the CDR Energy API resources for accounts, balances, invoices, billing, payment
+    schedules, concessions, electricity service points, usage and DER. Access requires status as an ACCC
+    accredited data recipient (or an authorised representative) holding a valid CDR consent: the consumer
+    is redirected from the ADR to Powershop, verifies identity with a one-time password by email, and
+    selects the accounts, data types and sharing duration. The authenticated base URI is not published
+    anonymously and is resolved through the CDR Register over mutual TLS, so no base URL is asserted here.
+    Consents are managed at https://dashboard.cdr.powershop.com.au/ (HTTP 200 on 2026-07-27).
+  humanURL: https://www.powershop.com.au/privacy-policy/cdr-policy
+  tags:
+  - Energy
+  - Consumer Data Right
+  - Accounts
+  - Billing
+  - Invoices
+  - Smart Metering
+  - DER
+  - Solar
+  - Consent
+  - Australia
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-cdr-energy-api-openapi.json
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+common:
+- type: Website
+  url: https://www.powershop.com.au/
+- type: PrivacyPolicy
+  url: https://www.powershop.com.au/privacy-policy
+- type: Documentation
+  url: https://www.powershop.com.au/privacy-policy/cdr-policy
+- type: Documentation
+  url: https://www.powershop.com.au/powershop-and-shell
+- type: Registry
+  url: https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary
+- type: Documentation
+  url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+- type: Specification
+  url: https://consumerdatastandardsaustralia.github.io/standards/
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
