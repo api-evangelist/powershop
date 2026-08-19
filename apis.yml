@@ -43,7 +43,7 @@ enrichment:
     machine-readable spec, no /.well-known document, no GraphQL and no MCP
     surface exists. Artifacts derived from the two Data Standards Body
     specifications and from live probes of the Powershop and AER CDR hosts.
-specificationVersion: '0.19'
+specificationVersion: '0.23'
 apis:
 - aid: powershop:powershop-cdr-generic-tariff-api
   name: Powershop CDR Generic Tariff (Energy Plans) API
