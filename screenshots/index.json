@@ -1,0 +1,11 @@
+[
+  {
+    "repo": "powershop",
+    "captured_at": "2026-08-17T124837",
+    "source_url": "https://www.powershop.com.au/",
+    "source_type": "Website",
+    "file": "powershop-2026-08-17T124837.png",
+    "bytes": 306413,
+    "capture": "playwright-local"
+  }
+]
