@@ -147,6 +147,17 @@ apis:
   tags:
   - Energy
   - Consumer Data Right
+  - Account
+  - Billing
+  - Invoices
+  - Smart Metering
+  - DER
+  - Solar
+  - Consent
+  - Australia
+  tags_raw:
+  - Energy
+  - Consumer Data Right
   - Accounts
   - Billing
   - Invoices
