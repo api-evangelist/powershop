@@ -45,33 +45,16 @@ enrichment:
     specifications and from live probes of the Powershop and AER CDR hosts.
 specificationVersion: '0.23'
 apis:
-- aid: powershop:powershop-cdr-generic-tariff-api
-  name: Powershop CDR Generic Tariff (Energy Plans) API
-  description: >-
-    The public, unauthenticated Consumer Data Right Generic Tariff API carrying every Powershop retail
-    energy plan. Under the CDR energy designation the Australian Energy Regulator — not the retailer — is
-    the data holder for generic tariff data, so Powershop's plan data is served from the AER's Energy Made
-    Easy CDR host rather than from Powershop's own infrastructure. Confirmed live on 2026-07-27:
-    GET /cds-au/v1/energy/plans returned HTTP 200 with meta.totalRecords 482 — 416 electricity and 66 gas
-    plans, 313 MARKET and 169 STANDING, 297 residential and 185 business — spanning the Ausgrid, Endeavour,
-    Essential Energy, Jemena, Citipower, Powercor, United Energy, AusNet, Multinet, Energex, SA Power
-    Networks and Australian Gas Networks distribution zones. GET /cds-au/v1/energy/plans/{planId} returned
-    HTTP 200 for planId PSH1060421MRE2@EME. No API key, no registration, no accreditation required.
+- aid: powershop:powershop-data-holder-customers-api
+  name: Powershop Data Holder Customers API
+  description: Data Holder Customer endpoints
   humanURL: https://cdr.energymadeeasy.gov.au/
   baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
   tags:
-  - Energy
-  - Tariffs
-  - Consumer Data Right
-  - Open Data
-  - Electricity
-  - Gas
-  - Australia
+  - Data Holder Customers
   properties:
   - type: OpenAPI
-    url: openapi/powershop-cdr-energy-api-openapi.json
-  - type: Overlay
-    url: overlays/powershop-cdr-energy-api-overlay.yaml
+    url: openapi/powershop-data-holder-customers-api-openapi.yml
   - type: Documentation
     url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
   - type: Documentation
@@ -86,34 +69,6 @@ apis:
     url: errors/powershop-problem-types.yml
   - type: DataModel
     url: data-model/powershop-data-model.yml
-  - type: AgentSkill
-    url: skills/powershop-lookup-energy-plans.md
-    name: Look up Powershop energy plans (CDR Generic Tariff)
-- aid: powershop:powershop-cdr-discovery-api
-  name: Powershop CDR Discovery API
-  description: >-
-    The Consumer Data Standards Discovery endpoints served from Powershop's own registered CDR public base
-    URI. This is the surface that proves the implementation exists rather than merely being designated.
-    Confirmed live on 2026-07-27 with no authentication:
-    GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/status returned HTTP 200 with
-    {"data":{"status":"OK","explanation":"All services operational"}}, and
-    GET https://public.cdr.powershop.com.au/cds-au/v1/discovery/outages returned HTTP 200 with an empty
-    outages array. Both responses carry the CDS data/links/meta envelope. The root path and
-    /cds-au/v1/energy/plans on this host both return HTTP 404, confirming that Powershop's own public base
-    URI carries only the Discovery endpoints and that tariff data lives with the regulator.
-  humanURL: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
-  baseURL: https://public.cdr.powershop.com.au/cds-au/v1
-  tags:
-  - Energy
-  - Consumer Data Right
-  - Discovery
-  - Status
-  - Australia
-  properties:
-  - type: OpenAPI
-    url: openapi/powershop-cdr-common-api-openapi.json
-  - type: Overlay
-    url: overlays/powershop-cdr-common-api-overlay.yaml
   - type: Documentation
     url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
   - type: APIReference
@@ -122,79 +77,341 @@ apis:
     url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
   - type: Lifecycle
     url: lifecycle/powershop-lifecycle.yml
-  - type: Conventions
-    url: conventions/powershop-conventions.yml
-  - type: ErrorCatalog
-    url: errors/powershop-problem-types.yml
-  - type: AgentSkill
-    url: skills/powershop-check-cdr-status.md
-    name: Check Powershop CDR availability before sharing data
-- aid: powershop:powershop-cdr-energy-consumer-data-api
-  name: Powershop CDR Energy Consumer Data API
-  description: >-
-    The consented, accreditation-gated half of Powershop's Consumer Data Right obligation. Powershop's own
-    published CDR policy names the data it shares — customer data, account data (account number, creation
-    date, product data, payment arrangements, concessions and rebates), invoice and billing data, and
-    AEMO-sourced data comprising metering usage data, NMI standing data and DER (solar) register data —
-    which maps onto the CDR Energy API resources for accounts, balances, invoices, billing, payment
-    schedules, concessions, electricity service points, usage and DER. Access requires status as an ACCC
-    accredited data recipient (or an authorised representative) holding a valid CDR consent: the consumer
-    is redirected from the ADR to Powershop, verifies identity with a one-time password by email, and
-    selects the accounts, data types and sharing duration. The authenticated base URI is not published
-    anonymously and is resolved through the CDR Register over mutual TLS, so no base URL is asserted here.
-    Consents are managed at https://dashboard.cdr.powershop.com.au/ (HTTP 200 on 2026-07-27).
-  humanURL: https://www.powershop.com.au/privacy-policy/cdr-policy
-  tags:
-  - Energy
-  - Consumer Data Right
-  - Account
-  - Billing
-  - Invoices
-  - Smart Metering
-  - DER
-  - Solar
-  - Consent
-  - Australia
-  tags_raw:
-  - Energy
-  - Consumer Data Right
-  - Accounts
-  - Billing
-  - Invoices
-  - Smart Metering
-  - DER
-  - Solar
-  - Consent
-  - Australia
-  properties:
-  - type: OpenAPI
-    url: openapi/powershop-cdr-energy-api-openapi.json
   - type: Documentation
     url: https://www.powershop.com.au/privacy-policy/cdr-policy
-  - type: Documentation
-    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
   - type: Authentication
     url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
-  - type: Authentication
-    url: authentication/powershop-authentication.yml
   - type: OAuthScopes
     url: scopes/powershop-scopes.yml
   - type: ConsentDashboard
     url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-data-holder-operations-api
+  name: Powershop Data Holder Operations API
+  description: Data Holder Operations endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Data Holder Operations
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-data-holder-operations-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
   - type: APIReference
     url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
-  - type: Overlay
-    url: overlays/powershop-cdr-energy-api-overlay.yaml
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
   - type: Conventions
     url: conventions/powershop-conventions.yml
   - type: ErrorCatalog
     url: errors/powershop-problem-types.yml
   - type: DataModel
     url: data-model/powershop-data-model.yml
-  - type: AgentSkill
-    url: skills/powershop-share-consumer-energy-data.md
-    name: Share Powershop consumer energy data as an accredited data recipient
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-distributed-energy-resources-api
+  name: Powershop Distributed Energy Resources API
+  description: Distributed Energy Resource endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Distributed Energy Resources
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-distributed-energy-resources-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
+  - type: Conventions
+    url: conventions/powershop-conventions.yml
+  - type: ErrorCatalog
+    url: errors/powershop-problem-types.yml
+  - type: DataModel
+    url: data-model/powershop-data-model.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-electricity-service-points-api
+  name: Powershop Electricity Service Points API
+  description: Electricity Service Point endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Electricity Service Points
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-electricity-service-points-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
+  - type: Conventions
+    url: conventions/powershop-conventions.yml
+  - type: ErrorCatalog
+    url: errors/powershop-problem-types.yml
+  - type: DataModel
+    url: data-model/powershop-data-model.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-electricity-usage-api
+  name: Powershop Electricity Usage API
+  description: Electricity Usage endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Electricity Usage
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-electricity-usage-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
+  - type: Conventions
+    url: conventions/powershop-conventions.yml
+  - type: ErrorCatalog
+    url: errors/powershop-problem-types.yml
+  - type: DataModel
+    url: data-model/powershop-data-model.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-energy-account-balances-api
+  name: Powershop Energy Account Balances API
+  description: Energy Account Balance endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Energy Account Balances
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-energy-account-balances-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
+  - type: Conventions
+    url: conventions/powershop-conventions.yml
+  - type: ErrorCatalog
+    url: errors/powershop-problem-types.yml
+  - type: DataModel
+    url: data-model/powershop-data-model.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-energy-account-billing-api
+  name: Powershop Energy Account Billing API
+  description: Energy Account Billing endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Energy Account Billing
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-energy-account-billing-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
+  - type: Conventions
+    url: conventions/powershop-conventions.yml
+  - type: ErrorCatalog
+    url: errors/powershop-problem-types.yml
+  - type: DataModel
+    url: data-model/powershop-data-model.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-energy-accounts-api
+  name: Powershop Energy Accounts API
+  description: Energy Account endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Energy Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-energy-accounts-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
+  - type: Conventions
+    url: conventions/powershop-conventions.yml
+  - type: ErrorCatalog
+    url: errors/powershop-problem-types.yml
+  - type: DataModel
+    url: data-model/powershop-data-model.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
+- aid: powershop:powershop-energy-plans-api
+  name: Powershop Energy Plans API
+  description: Energy Plan endpoints
+  humanURL: https://cdr.energymadeeasy.gov.au/
+  baseURL: https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1
+  tags:
+  - Energy Plans
+  properties:
+  - type: OpenAPI
+    url: openapi/powershop-energy-plans-api-openapi.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Documentation
+    url: https://www.cdr.gov.au/rollout/cdr-energy-sector
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#energy-apis
+  - type: Authentication
+    url: authentication/powershop-authentication.yml
+  - type: Conventions
+    url: conventions/powershop-conventions.yml
+  - type: ErrorCatalog
+    url: errors/powershop-problem-types.yml
+  - type: DataModel
+    url: data-model/powershop-data-model.yml
+  - type: Documentation
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: APIReference
+    url: https://consumerdatastandardsaustralia.github.io/standards/#common-apis
+  - type: StatusPage
+    url: https://public.cdr.powershop.com.au/cds-au/v1/discovery/status
+  - type: Lifecycle
+    url: lifecycle/powershop-lifecycle.yml
+  - type: Documentation
+    url: https://www.powershop.com.au/privacy-policy/cdr-policy
+  - type: Authentication
+    url: https://consumerdatastandardsaustralia.github.io/standards/#security-profile
+  - type: OAuthScopes
+    url: scopes/powershop-scopes.yml
+  - type: ConsentDashboard
+    url: https://dashboard.cdr.powershop.com.au/
 common:
+- type: AgentSkill
+  url: skills/powershop-lookup-energy-plans.md
+- type: AgentSkill
+  url: skills/powershop-check-cdr-status.md
+- type: AgentSkill
+  url: skills/powershop-share-consumer-energy-data.md
 - type: AgenticAccess
   url: agentic-access/powershop-agentic-access.yml
 - type: DomainSecurity
