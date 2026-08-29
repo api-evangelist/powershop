@@ -21,6 +21,18 @@ description: >-
   schedules, concessions, plus AEMO-sourced metering, NMI standing and DER register data — is real,
   documented, and reachable only by an accredited data recipient acting on an authenticated consumer
   consent. Open tariff data, closed consumer data: a mandate that was implemented, not merely claimed.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://www.powershop.com.au/powershop-logo.png
 tags:
 - Energy
