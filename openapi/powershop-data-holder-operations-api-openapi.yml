@@ -119,47 +119,16 @@ paths:
       - Data Holder Operations
       x-version: '1'
 components:
-  headers:
-    XV:
-      description: The [payload version](#response-headers) that the endpoint has responded with.
-      explode: false
-      required: true
-      schema:
-        type: string
-      style: simple
   schemas:
-    ErrorV2_meta:
-      description: Additional data for customised error codes.
+    ResponseDiscoveryOutagesList_data:
       properties:
-        urn:
-          description: The CDR error code URN which the application-specific error code extends. Mandatory if the error _code_ is an application-specific error rather than a standardised error code.
-          type: string
-      type: object
-      x-conditional:
-      - urn
-    ResponseErrorListV2:
-      properties:
-        errors:
-          description: List of errors.
+        outages:
+          description: List of scheduled outages. Property is mandatory but may contain an empty list if no outages are scheduled.
           items:
-            $ref: '#/components/schemas/ErrorV2'
+            $ref: '#/components/schemas/DiscoveryOutage'
           type: array
       required:
-      - errors
-      type: object
-    ResponseDiscoveryOutagesList:
-      properties:
-        data:
-          $ref: '#/components/schemas/ResponseDiscoveryOutagesList_data'
-        links:
-          $ref: '#/components/schemas/Links'
-        meta:
-          $ref: '#/components/schemas/Meta'
-      required:
-      - data
-      - links
-      type: object
-    Meta:
+      - outages
       type: object
     ResponseCommonDiscoveryStatus_data:
       properties:
@@ -192,16 +161,6 @@ components:
       type: object
       x-conditional:
       - explanation
-    ResponseDiscoveryOutagesList_data:
-      properties:
-        outages:
-          description: List of scheduled outages. Property is mandatory but may contain an empty list if no outages are scheduled.
-          items:
-            $ref: '#/components/schemas/DiscoveryOutage'
-          type: array
-      required:
-      - outages
-      type: object
     ErrorV2:
       properties:
         code:
@@ -222,6 +181,27 @@ components:
       type: object
       x-conditional:
       - meta
+    Meta:
+      type: object
+    ResponseErrorListV2:
+      properties:
+        errors:
+          description: List of errors.
+          items:
+            $ref: '#/components/schemas/ErrorV2'
+          type: array
+      required:
+      - errors
+      type: object
+    Links:
+      properties:
+        self:
+          description: Fully qualified link that generated the current response document.
+          type: string
+          x-cds-type: URIString
+      required:
+      - self
+      type: object
     DiscoveryOutage:
       properties:
         outageTime:
@@ -243,6 +223,27 @@ components:
       - explanation
       - outageTime
       type: object
+    ErrorV2_meta:
+      description: Additional data for customised error codes.
+      properties:
+        urn:
+          description: The CDR error code URN which the application-specific error code extends. Mandatory if the error _code_ is an application-specific error rather than a standardised error code.
+          type: string
+      type: object
+      x-conditional:
+      - urn
+    ResponseDiscoveryOutagesList:
+      properties:
+        data:
+          $ref: '#/components/schemas/ResponseDiscoveryOutagesList_data'
+        links:
+          $ref: '#/components/schemas/Links'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      required:
+      - data
+      - links
+      type: object
     ResponseCommonDiscoveryStatus:
       properties:
         data:
@@ -255,12 +256,11 @@ components:
       - data
       - links
       type: object
-    Links:
-      properties:
-        self:
-          description: Fully qualified link that generated the current response document.
-          type: string
-          x-cds-type: URIString
-      required:
-      - self
-      type: object
+  headers:
+    XV:
+      description: The [payload version](#response-headers) that the endpoint has responded with.
+      explode: false
+      required: true
+      schema:
+        type: string
+      style: simple
