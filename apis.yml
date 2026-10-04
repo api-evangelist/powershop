@@ -432,6 +432,9 @@ apis:
   - type: ConsentDashboard
     url: https://dashboard.cdr.powershop.com.au/
 common:
+- type: CapabilityMap
+  url: capabilities/powershop-capability-edges.yml
+  name: Powershop Business Capability Map
 - type: AgentSkill
   url: skills/powershop-lookup-energy-plans.md
 - type: AgentSkill
