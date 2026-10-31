@@ -1,4 +1,4 @@
-# Powershop (powershop)
+# Powershop
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,87 +64,135 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Powershop is an Australian retail energy brand selling electricity in New South Wales, Victoria, south-east Queensland and South Australia, and gas in New South Wales and Victoria. It is operated by Powershop Australia Pty Ltd (ABN 41 154 914 075), a wholly owned Shell Energy Australia business since Shell completed its acquisition from Meridian Energy in February 2022. Powershop publishes no first-party developer portal and no self-serve API — its entire API surface is the Consumer Data Right, which it has actually implemented and not merely claimed.
+Powershop is an Australian retail energy brand selling electricity in New South Wales, Victoria, south-east Queensland and South Australia, and gas in New South Wales and Victoria. It is operated by Powershop Australia Pty Ltd (ABN 41 154 914 075), a wholly owned Shell Energy Australia business since Shell completed its acquisition from Meridian Energy in February 2022. Powershop sits at the retail end of the energy value chain — it buys wholesale, bills the customer, and owns the customer relationship — and is known for its "Powerpacks" prepay purchasing model, GreenPower add-on, and EV Day/EV Night plans. Its API posture is entirely regulatory, not commercial: Powershop publishes NO first-party developer portal, no API keys, and no self-serve documentation, and has publicly said since 2017 that it has no public API. What it does have is a verified Consumer Data Right (CDR) energy implementation. Powershop is a designated CDR energy data holder listed live on the ACCC CDR Register with a public base URI of https://public.cdr.powershop.com.au, which returns standards-conformant Consumer Data Standards responses for /cds-au/v1/discovery/status and /cds-au/v1/discovery/outages without authentication. Its Generic Tariff (plan) data is served openly and anonymously from the Australian Energy Regulator's Energy Made Easy CDR host, where 482 Powershop electricity and gas plans are retrievable with no credentials at all. The customer-level data the mandate actually exists to unlock — accounts, billing, invoices, payment schedules, concessions, plus AEMO-sourced metering, NMI standing and DER register data — is real, documented, and reachable only by an accredited data recipient acting on an authenticated consumer consent. Open tariff data, closed consumer data: a mandate that was implemented, not merely claimed.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/powershop/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/powershop/refs/heads/main/apis.yml)
+**Areas:** Energy · Australia · Utilities · Electricity · Gas · Consumer Data Right · Energy Retail · Smart Metering · Solar · Tariffs · Open Data
 
-## Tags
+## Powershop on APIs.io
 
-- Energy
-- Australia
-- Utilities
-- Electricity
-- Gas
-- Consumer Data Right
-- Energy Retail
-- Smart Metering
-- Solar
-- Tariffs
-- Open Data
+Everything profiled for Powershop is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/powershop/](https://apis.io/providers/powershop/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (9)
 
-- **Created:** 2026-07-27
-- **Modified:** 2026-07-27
+- [Powershop Data Holder Customers API](https://apis.io/apis/powershop/powershop-data-holder-customers-api/) — Data Holder Customer endpoints
+- [Powershop Data Holder Operations API](https://apis.io/apis/powershop/powershop-data-holder-operations-api/) — Data Holder Operations endpoints
+- [Powershop Distributed Energy Resources API](https://apis.io/apis/powershop/powershop-distributed-energy-resources-api/) — Distributed Energy Resource endpoints
+- [Powershop Electricity Service Points API](https://apis.io/apis/powershop/powershop-electricity-service-points-api/) — Electricity Service Point endpoints
+- [Powershop Electricity Usage API](https://apis.io/apis/powershop/powershop-electricity-usage-api/) — Electricity Usage endpoints
+- [Powershop Energy Account Balances API](https://apis.io/apis/powershop/powershop-energy-account-balances-api/) — Energy Account Balance endpoints
+- [Powershop Energy Account Billing API](https://apis.io/apis/powershop/powershop-energy-account-billing-api/) — Energy Account Billing endpoints
+- [Powershop Energy Accounts API](https://apis.io/apis/powershop/powershop-energy-accounts-api/) — Energy Account endpoints
+- [Powershop Energy Plans API](https://apis.io/apis/powershop/powershop-energy-plans-api/) — Energy Plan endpoints
 
-## Mandate Posture
+### Published properties
 
-- **Regime:** Consumer Data Right (CDR), energy sector — the same statutory machinery (Treasury designation, ACCC, OAIC, Data Standards Body) that produced Australia's banking APIs.
-- **Status:** `live-implemented`. Powershop appears in the public ACCC CDR Register energy brand summary (`dataHolderBrandId` `6aaeaf9b-5132-ee11-a83d-000d3a8830d6`, `publicBaseUri` `https://public.cdr.powershop.com.au`, `lastUpdated` 2026-07-27), and that base URI returns live, standards-conformant responses.
-- **Standard:** CDR Consumer Data Standards v1.36.0 — CDR Energy API and CDR Common API (OpenAPI 3.0.3).
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## APIs
+#### MCP servers (1)
 
-### Powershop CDR Generic Tariff (Energy Plans) API
+Model Context Protocol servers that expose the API to agents.
 
-Public, unauthenticated Consumer Data Right plan data. Under the energy designation the Australian Energy Regulator — not the retailer — holds generic tariff data, so Powershop's plans are served from the AER's Energy Made Easy CDR host. Confirmed 2026-07-27: `GET /cds-au/v1/energy/plans` returned HTTP 200 with 482 plans (416 electricity / 66 gas; 313 MARKET / 169 STANDING; 297 residential / 185 business).
+- [powershop](https://apis.io/servers/powershop/powershop/)
 
-- **Human URL:** [https://cdr.energymadeeasy.gov.au/](https://cdr.energymadeeasy.gov.au/)
-- **Base URL:** `https://cdr.energymadeeasy.gov.au/powershop/cds-au/v1`
+#### Agentic access (1)
 
-#### Properties
+Which operations an agent can call, which act, and which need a human in the loop.
 
-- [OpenAPI](openapi/powershop-cdr-energy-api-openapi.json) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Documentation](https://consumerdatastandardsaustralia.github.io/standards/#energy-apis)
-- [Documentation](https://www.cdr.gov.au/rollout/cdr-energy-sector)
+- [Powershop Agentic Access](https://apis.io/agentic-access/powershop/powershop-agentic-access/)
 
-### Powershop CDR Discovery API
+#### Collections (2)
 
-The Consumer Data Standards Discovery endpoints on Powershop's own registered CDR public base URI — the surface that proves the implementation is deployed. Confirmed 2026-07-27, unauthenticated: `/cds-au/v1/discovery/status` HTTP 200 (`status: OK`, "All services operational") and `/cds-au/v1/discovery/outages` HTTP 200 (empty outages array).
+Postman and Open Collection request collections.
 
-- **Human URL:** [https://consumerdatastandardsaustralia.github.io/standards/#common-apis](https://consumerdatastandardsaustralia.github.io/standards/#common-apis)
-- **Base URL:** `https://public.cdr.powershop.com.au/cds-au/v1`
+- [CDR Common API](https://apis.io/collections/powershop/open-powershop-cdr-common-api/)
+- [CDR Energy API](https://apis.io/collections/powershop/open-powershop-cdr-energy-api/)
 
-#### Properties
+#### Overlays (2)
 
-- [OpenAPI](openapi/powershop-cdr-common-api-openapi.json) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Documentation](https://consumerdatastandardsaustralia.github.io/standards/#common-apis)
-- [Status](https://public.cdr.powershop.com.au/cds-au/v1/discovery/status)
+OpenAPI overlays, including conversational phrasing for each operation.
 
-### Powershop CDR Energy Consumer Data API
+- [Powershop Cdr Common Api Overlay](https://apis.io/overlays/powershop/powershop-cdr-common-api-overlay/)
+- [Powershop Cdr Energy Api Overlay](https://apis.io/overlays/powershop/powershop-cdr-energy-api-overlay/)
 
-The consented, accreditation-gated half of the obligation: customer, account, invoice and billing data plus AEMO-sourced metering, NMI standing and DER register data. Reachable only by an ACCC accredited data recipient holding a valid consumer consent. No anonymous base URI is published.
+#### Security (2)
 
-- **Human URL:** [https://www.powershop.com.au/privacy-policy/cdr-policy](https://www.powershop.com.au/privacy-policy/cdr-policy)
+Authentication, trust centre, and vulnerability disclosure.
 
-#### Properties
+- [Powershop Authentication](https://apis.io/security/powershop/powershop-authentication/)
+- [Powershop Domain Security](https://apis.io/security/powershop/powershop-domain-security/)
 
-- [OpenAPI](openapi/powershop-cdr-energy-api-openapi.json) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Documentation](https://www.powershop.com.au/privacy-policy/cdr-policy)
-- [Documentation](https://consumerdatastandardsaustralia.github.io/standards/#energy-apis)
-- [Authentication](https://consumerdatastandardsaustralia.github.io/standards/#security-profile)
-- [Consent Dashboard](https://dashboard.cdr.powershop.com.au/)
+#### OAuth scopes (1)
 
-## Common Properties
+The permissions the API asks for.
+
+- [Powershop Scopes](https://apis.io/scopes/powershop/powershop-scopes/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.powershop.com.au/)
-- [Privacy Policy](https://www.powershop.com.au/privacy-policy)
-- [CDR Policy](https://www.powershop.com.au/privacy-policy/cdr-policy)
-- [Shell x Powershop](https://www.powershop.com.au/powershop-and-shell)
-- [CDR Register (energy brands)](https://api.cdr.gov.au/cdr-register/v1/energy/data-holders/brands/summary)
-- [CDR energy sector rollout](https://www.cdr.gov.au/rollout/cdr-energy-sector)
-- [Consumer Data Standards](https://consumerdatastandardsaustralia.github.io/standards/)
+- [Documentation](https://www.powershop.com.au/privacy-policy/cdr-policy)
+- [API reference](https://consumerdatastandardsaustralia.github.io/standards/#energy-apis)
+- [Pricing](https://www.powershop.com.au/energy-rates-and-prices)
+- [Sign up](https://www.powershop.com.au/sign-up)
+- [Support](https://www.powershop.com.au/help-centre)
+- [Blog](https://www.powershop.com.au/energy-insights)
+- [Terms of service](https://www.powershop.com.au/terms-and-conditions)
+- [Privacy policy](https://www.powershop.com.au/privacy-policy)
+- [Status](https://public.cdr.powershop.com.au/cds-au/v1/discovery/status)
 
-## What Is Not Here
+## API Evangelist rating
 
-Powershop Australia publishes no developer portal, no API keys, and no self-serve documentation. `developer.`, `developers.`, `api.`, `docs.` and `data.powershop.com.au` do not resolve. Powershop stated publicly in 2017 that it had no public API, and that remains true. The `fluxfederation/powershop-api` GitHub repository is the legacy New Zealand Powershop / Flux Federation API, not an Australian Powershop product, and is not listed here.
+**Kin Score 43.0** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 66.1 |
+| Contract quality | 44.7 |
+| Contract governance | 18.2 |
+| Operational transparency | 31.6 |
+| Developer ergonomics | 37.5 |
+| Access clarity | 44.7 |
+
+**Agent readiness 25.5** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | — |
+| Rate Limit Signal | — |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 34.4** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/powershop/](https://apis.io/providers/powershop/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Powershop: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/powershop/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
